@@ -4,7 +4,7 @@ package com.teamsynergy.cryptologue;
  * Created by Sean on 3/23/2017.
  */
 
-public class UserAccount implements SecurityCheck {
+public class UserAccount extends User implements SecurityCheck {
     private boolean mIsValid = true;
 
     @Override
