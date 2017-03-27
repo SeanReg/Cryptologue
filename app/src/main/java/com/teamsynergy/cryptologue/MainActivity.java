@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.teamsynergy.cryptologue.UI.HomepageActivity;
 import com.teamsynergy.cryptologue.UI.LoginActivity;
 import com.teamsynergy.cryptologue.UI.SignupActivity;
 
@@ -34,6 +35,16 @@ public class MainActivity extends AppCompatActivity {
                 Intent Intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(Intent);}
         });
+
+        Button button3 = ((Button)findViewById(R.id.HomepageButton));
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent Intent = new Intent(getApplicationContext(), HomepageActivity.class);
+                startActivity(Intent);}
+        });
+
+
         ParseInit.start(this);
     }
 }

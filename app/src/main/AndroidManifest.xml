@@ -77,6 +77,9 @@
             android:name=".UI.SignupActivity"
             android:label="@string/title_activity_signup"
             android:theme="@style/AppTheme.Dark"></activity>
+        <activity
+            android:name=".UI.HomepageActivity"
+            android:theme="@style/AppTheme.Dark"></activity>
     </application>
 
 </manifest>
