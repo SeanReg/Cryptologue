@@ -12,22 +12,30 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.UserAccount;
 
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
 
-    EditText _emailText = ((EditText)findViewById(R.id.input_email));
-    EditText _passwordText = ((EditText)findViewById(R.id.input_password));
-    Button _loginButton = ((Button)findViewById(R.id.btn_login));
-    TextView _signupLink = ((TextView)findViewById(R.id.link_signup));
+    EditText _emailText;
+    EditText _passwordText;
+    Button _loginButton;
+    TextView _signupLink;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        _emailText = ((EditText)findViewById(R.id.input_email));
+        _passwordText = ((EditText)findViewById(R.id.input_password));
+        _loginButton = ((Button)findViewById(R.id.btn_login));
+        _signupLink = ((TextView)findViewById(R.id.link_signup));
 
         _loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -50,15 +58,15 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login() {
         Log.d(TAG, "Login");
-
-        if (!validate()) {
-            onLoginFailed();
-            return;
-        }
+//
+//        if (!validate()) {
+//            onLoginFailed();
+//            return;
+//        }
 
         _loginButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
@@ -67,16 +75,20 @@ public class LoginActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
 
         // TODO: Implement your own authentication logic here.
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
+        AccountManager.getInstance().login(email, password, new AccountManager.onAccountStatus() {
+            @Override
+            public void onLogin(UserAccount account) {
+                // On complete call either onLoginSuccess or onLoginFailed
+                onLoginSuccess();
+                // onLoginFailed();
+                progressDialog.dismiss();
+            }
+            @Override
+            public void onLoginError(ParseException e) {
+                onLoginFailed(e.getMessage());
+                progressDialog.dismiss();
+            }
+        });
     }
 
 
@@ -99,13 +111,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
+        Toast.makeText(getBaseContext(), "LOG IN SUCCESSFUL.", Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
         finish();
     }
 
-    public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
-
+    public void onLoginFailed(String message) {
+        Toast.makeText(getBaseContext(), message, Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
     }
 

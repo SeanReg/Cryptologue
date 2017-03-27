@@ -10,21 +10,29 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.UserAccount;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
 
-    EditText _nameText = ((EditText)findViewById(R.id.input_name));
-    EditText _emailText = ((EditText)findViewById(R.id.input_email));
-    EditText _passwordText = ((EditText)findViewById(R.id.input_password));
-    Button _signupButton = ((Button)findViewById(R.id.btn_signup));
-    TextView _loginLink = ((TextView)findViewById(R.id.link_login));
+    EditText _nameText;
+    EditText _emailText;
+    EditText _passwordText;
+    Button _signupButton;
+    TextView _loginLink;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+
+        _nameText = ((EditText)findViewById(R.id.input_name));
+        _emailText = ((EditText)findViewById(R.id.input_email));
+        _passwordText = ((EditText)findViewById(R.id.input_password));
+        _signupButton = ((Button)findViewById(R.id.btn_signup));
+        _loginLink = ((TextView)findViewById(R.id.link_login));
 
         _signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,7 +60,7 @@ public class SignupActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this);
+        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
         progressDialog.show();
@@ -60,19 +68,16 @@ public class SignupActivity extends AppCompatActivity {
         String name = _nameText.getText().toString();
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
+        String phone = "9542549695";
 
         // TODO: Implement your own signup logic here.
-
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onSignupSuccess or onSignupFailed
-                        // depending on success
-                        onSignupSuccess();
-                        // onSignupFailed();
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
+        AccountManager.getInstance().register(email, name, password, phone, new AccountManager.onAccountStatus() {
+            @Override
+            public void onRegistered(UserAccount account) {
+                onSignupSuccess();
+                progressDialog.dismiss();
+            }
+        });
     }
 
 

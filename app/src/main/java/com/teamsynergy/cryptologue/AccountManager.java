@@ -142,20 +142,20 @@ public class AccountManager {
      *
      * The interface On account status.
      */
-    public abstract class onAccountStatus {
+    public static abstract class onAccountStatus {
         /**
          * Called when a user has successfully been
          * authenticated with the Parse server
          * @param account the Account of the newly logged in user
          */
-        public abstract void onLogin(UserAccount account);
+        public void onLogin(UserAccount account) {};
 
         /**
          * Called when a user has successfully been
          * registered with the Parse server
          * @param account the Account of the newly registered in user
          */
-        public abstract void onRegistered(UserAccount account);
+        public void onRegistered(UserAccount account) {};
 
         /**
          * Called when an authentication error has occured
@@ -163,7 +163,7 @@ public class AccountManager {
          * in
          * @param e contains the ParseException and reason that the the login failed
          */
-        public abstract void onLoginError(ParseException e);
+        public void onLoginError(ParseException e) {};
 
         /**
          * Called when a signup error has occured
@@ -171,6 +171,6 @@ public class AccountManager {
          * new user
          * @param e contains the ParseException and reason that the the registration failed
          */
-        public abstract void onRegistrationError(ParseException e);
+        public void onRegistrationError(ParseException e) {};
     }
 }
