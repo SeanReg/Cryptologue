@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.teamsynergy.cryptologue.UI.ChatroomActivity;
 import com.teamsynergy.cryptologue.UI.LoginActivity;
 import com.teamsynergy.cryptologue.UI.SignupActivity;
 
@@ -32,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent Intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(Intent);}
+        });
+
+        Button button3 = ((Button)findViewById(R.id.chatroomButton));
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent Intent = new Intent(getApplicationContext(), ChatroomActivity.class);
                 startActivity(Intent);}
         });
         ParseInit.start(this);

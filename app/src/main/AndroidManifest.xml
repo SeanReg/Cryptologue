@@ -8,10 +8,10 @@
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <permission
-        android:name="com.cop4331.oneshot.permission.C2D_MESSAGE"
+        android:name="com.teamsynergy.cryptologue.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.cop4331.oneshot.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.teamsynergy.cryptologue.permission.C2D_MESSAGE" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -24,7 +24,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:theme="@style/AppTheme.Dark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -65,17 +66,21 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
 
-                <category android:name="com.cop4331.oneshot" />
+                <category android:name="com.teamsynergy.cryptologue" />
             </intent-filter>
         </receiver>
 
         <activity
             android:name=".UI.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Dark"></activity>
+            android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".UI.SignupActivity"
             android:label="@string/title_activity_signup"
+            android:theme="@style/AppTheme.Dark" />
+        <activity
+            android:name=".UI.ChatroomActivity"
+            android:label="@string/title_activity_chatroom"
             android:theme="@style/AppTheme.Dark"></activity>
     </application>
 
