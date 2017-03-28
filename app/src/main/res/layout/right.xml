@@ -33,6 +33,7 @@
             android:layout_marginTop="0dp"
             android:layout_weight="0.00"
             android:src="@drawable/sean"
+            android:scaleType="centerInside"
             android:layout_gravity="end" />
 
     </LinearLayout>

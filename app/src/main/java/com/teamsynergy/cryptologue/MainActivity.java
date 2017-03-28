@@ -43,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent Intent = new Intent(getApplicationContext(), ChatroomActivity.class);
                 startActivity(Intent);}
         });
+
+
+        Intent Intent = new Intent(getApplicationContext(), MessagingService.class);
+        startService(Intent);
+
         ParseInit.start(this);
     }
 }

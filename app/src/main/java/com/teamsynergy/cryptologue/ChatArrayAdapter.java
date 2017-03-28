@@ -22,17 +22,7 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 
     @Override
     public void add(ChatMessage object) {
-        Log.d("Chat", "Adding");
-        View row;
-        if (object.left) {
-            row = inflater.inflate(R.layout.right, object.parent, false);
-        }else{
-            row = inflater.inflate(R.layout.left, object.parent, false);
-        }
-        chatText = (TextView) row.findViewById(R.id.msgr);
-        chatText.setText(object.message);
-
-        object.mView = row;
+        object.mView = null;
 
         chatMessageList.add(object);
         super.add(object);
@@ -52,8 +42,18 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
     }
 
     public View getView(int position, View row, ViewGroup parent) {
-        Log.d("Chat", "getView");
+        ChatMessage object = getItem(position);
 
-        return getItem(position).mView;
+        if (object.mView == null) {
+            if (object.left) {
+                object.mView = inflater.inflate(R.layout.right, parent, false);
+            } else {
+                object.mView = inflater.inflate(R.layout.left, parent, false);
+            }
+            chatText = (TextView) object.mView.findViewById(R.id.msgr);
+            chatText.setText(object.message);
+        }
+
+        return object.mView;
     }
 }

@@ -11,12 +11,10 @@ public class ChatMessage {
     public boolean left;
     public String message;
     public View mView;
-    public ViewGroup parent;
 
-    public ChatMessage(boolean left, String message, ViewGroup parentGroup) {
+    public ChatMessage(boolean left, String message) {
         super();
         this.left = left;
         this.message = message;
-        this.parent = parentGroup;
     }
 }

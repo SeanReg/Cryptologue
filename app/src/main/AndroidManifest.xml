@@ -49,6 +49,7 @@
              before the closing </application> tag
         -->
         <service android:name="com.parse.PushService" />
+        <service android:name=".MessagingService" />
 
         <receiver
             android:name="com.parse.ParsePushBroadcastReceiver"

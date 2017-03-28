@@ -55,7 +55,6 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        listView.setScrollingCacheEnabled(false);
         listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         listView.setAdapter(chatArrayAdapter);
 
@@ -70,8 +69,7 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     private boolean sendChatMessage() {
-        chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString(),
-                (ViewGroup)findViewById(R.id.msgview)));
+        chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString()));
         chatText.setText("");
         side = !side;
         return true;
