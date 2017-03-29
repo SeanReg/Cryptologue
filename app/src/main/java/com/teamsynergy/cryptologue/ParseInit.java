@@ -13,6 +13,7 @@ public class ParseInit {
 
     public static void start(Context con) {
         if (!mInitialized) {
+            mInitialized = true;
             //Intialize access to the Parse server
             Parse.initialize(new Parse.Configuration.Builder(con)
                     .applicationId("I6DUDtMs1nxNl3w4MA794RSqBGmgPl7gnlJrjrtW")
