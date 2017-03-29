@@ -83,6 +83,9 @@
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
             android:theme="@style/AppTheme.Dark"></activity>
+        <activity
+            android:name=".UI.HomepageActivity"
+            android:theme="@style/AppTheme.Dark"></activity>
     </application>
 
 </manifest>
