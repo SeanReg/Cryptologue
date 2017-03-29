@@ -42,41 +42,10 @@ public class HomepageActivity extends AppCompatActivity {
     }
 
     private void prepChatroomData(){
-        String name = "test1";
-        mChatroomNameList.add(name);
-        name= "test2";
-        mChatroomNameList.add(name);
-        name= "test3";
-        mChatroomNameList.add(name);
-        name= "test4";
-        mChatroomNameList.add(name);
-        name= "test5";
-        mChatroomNameList.add(name);
-        name= "test6";
-        mChatroomNameList.add(name);
-        name= "test7";
-        mChatroomNameList.add(name);
-        name= "test8";
-        mChatroomNameList.add(name);
-        name= "test9";
-        mChatroomNameList.add(name);
-        name= "test10";
-        mChatroomNameList.add(name);
-        name= "test11";
-        mChatroomNameList.add(name);
-        name = "test12";
-        mChatroomNameList.add(name);
-        name= "test13";
-        mChatroomNameList.add(name);
-        name= "test14";
-        mChatroomNameList.add(name);
-        name= "test15";
-        mChatroomNameList.add(name);
-        name= "test16";
-        mChatroomNameList.add(name);
-        name= "test17";
-        mChatroomNameList.add(name);
-        name= "test18";
+        String name = "test";
+        for (int i = 1; i <= 18; ++i) {
+            mChatroomNameList.add(name + Integer.toString(i));
+        }
     }
 
 
