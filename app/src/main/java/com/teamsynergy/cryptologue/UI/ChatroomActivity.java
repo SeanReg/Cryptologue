@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 
+import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
 import com.teamsynergy.cryptologue.ChatMessage;
@@ -66,6 +67,8 @@ public class ChatroomActivity extends AppCompatActivity {
                 listView.setSelection(chatArrayAdapter.getCount() - 1);
             }
         });
+
+        MessagingService.getInstance().socketSendMessage("Hello World - Android", "H8yPPTNu8W");
     }
 
     private boolean sendChatMessage() {

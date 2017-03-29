@@ -6,6 +6,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -18,17 +21,32 @@ import de.tavendo.autobahn.WebSocketException;
  */
 
 public class MessagingService extends Service {
-    private WebSocket mSocket = null;
+    private static final int MESSAGE_TYPE_IDENTIFY  = 1;
+    private static final int MESSAGE_TYPE_SEND_CHAT = 2;
 
+    private WebSocket mSocket = null;
+    private MessageListener mMessageListener = null;
+
+    private static MessagingService mServiceInstance = null;
+
+    public interface  MessageListener {
+        public void onMessageRecieved(String s);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        mServiceInstance = this;
+
         try {
             connectSocket();
         } catch (WebSocketException e) {
             e.printStackTrace();
         }
         return START_STICKY;
+    }
+
+    public static MessagingService getInstance() {
+        return mServiceInstance;
     }
 
     public void connectSocket() throws WebSocketException {
@@ -45,6 +63,11 @@ public class MessagingService extends Service {
             @Override
             public void onOpen() {
                 Log.d("Socket", "Connected to Server!");
+                try {
+                    socketIdentify();
+                } catch (WebSocketClosedException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -54,7 +77,10 @@ public class MessagingService extends Service {
 
             @Override
             public void onTextMessage(String s) {
+                if (mMessageListener != null)
+                    mMessageListener.onMessageRecieved(s);
 
+                Log.d("Socket", "Got message " + s);
             }
 
             @Override
@@ -67,6 +93,55 @@ public class MessagingService extends Service {
 
             }
         });
+    }
+
+    public void setMessagingListener(MessageListener listener) {
+        mMessageListener = listener;
+    }
+
+    public void socketSendMessage(String msg, String chatroom) {
+        try {
+            checkConnection();
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("mType", MESSAGE_TYPE_SEND_CHAT);
+                jsonObject.put("chatroomId", chatroom);
+                jsonObject.put("msg", msg);
+
+                mSocket.sendTextMessage(jsonObject.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (WebSocketClosedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void socketIdentify() throws WebSocketClosedException {
+        checkConnection();
+
+        AccountManager accountManager = AccountManager.getInstance();
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("mType", MESSAGE_TYPE_IDENTIFY);
+            jsonObject.put("clientId", accountManager.getCurrentAccount().getParseUser().getObjectId());
+            mSocket.sendTextMessage(jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void checkConnection() throws WebSocketClosedException {
+        if (mSocket == null || !mSocket.isConnected())
+            throw new WebSocketClosedException("WebSocket not connected!");
+    }
+    
+    private class WebSocketClosedException extends WebSocketException {
+        public WebSocketClosedException(String message) {
+            super(message);
+        }
     }
 
 

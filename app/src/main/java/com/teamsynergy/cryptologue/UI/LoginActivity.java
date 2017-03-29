@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.UserAccount;
 
@@ -111,6 +112,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
+        Intent Intent = new Intent(getApplicationContext(), MessagingService.class);
+        startService(Intent);
+
         Toast.makeText(getBaseContext(), "LOG IN SUCCESSFUL.", Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
         finish();

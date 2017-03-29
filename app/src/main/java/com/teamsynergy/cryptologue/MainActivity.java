@@ -20,7 +20,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = ((Button)findViewById(R.id.signupButton));
+        ParseInit.start(this);
+
+        if (AccountManager.getInstance().getCurrentAccount() == null) {
+            Intent Intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(Intent);
+        }
+
+/*        Button button = ((Button)findViewById(R.id.signupButton));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -33,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent Intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(Intent);}
-        });
+                startActivity(Intent);
+            }
+        });*/
 
         Button button3 = ((Button)findViewById(R.id.chatroomButton));
         button3.setOnClickListener(new View.OnClickListener() {
@@ -43,11 +51,5 @@ public class MainActivity extends AppCompatActivity {
                 Intent Intent = new Intent(getApplicationContext(), ChatroomActivity.class);
                 startActivity(Intent);}
         });
-
-
-        Intent Intent = new Intent(getApplicationContext(), MessagingService.class);
-        startService(Intent);
-
-        ParseInit.start(this);
     }
 }

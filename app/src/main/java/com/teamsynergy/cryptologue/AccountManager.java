@@ -35,13 +35,22 @@ public class AccountManager {
      */
     public static final String FIELD_DISPLAY_NAME   = "displayName";
 
+    private UserAccount mCurAccount = null;
+
 
     private AccountManager() {
 
     }
 
     public static AccountManager getInstance() {
+        if (mInstance.mCurAccount == null && ParseUser.getCurrentUser() != null)
+            mInstance.constructCurrentAccount();
+
         return mInstance;
+    }
+
+    public UserAccount getCurrentAccount() {
+        return mCurAccount;
     }
 
     /**
@@ -72,8 +81,8 @@ public class AccountManager {
             public void done(ParseException e) {
                 if (callback != null) {
                     if (e == null) {
-                        UserAccount account = new UserAccount();
-                        callback.onRegistered(account);
+                        constructCurrentAccount();
+                        callback.onRegistered(mCurAccount);
                     } else {
                         callback.onRegistrationError(e);
                     }
@@ -98,8 +107,8 @@ public class AccountManager {
                     if (callback != null) {
                         if (user != null) {
                             // Hooray! The user is logged in
-                            UserAccount account = new UserAccount();
-                            callback.onLogin(account);
+                            constructCurrentAccount();
+                            callback.onLogin(mCurAccount);
                         } else {
                             // Login failed. Look at the ParseException to see what happened.
                             callback.onLoginError(e);
@@ -110,6 +119,11 @@ public class AccountManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void constructCurrentAccount() {
+        ParseUser pUser = ParseUser.getCurrentUser();
+        mCurAccount = new UserAccount(pUser.getUsername(), (String)pUser.get("displayName"), (String)pUser.get("phone"), pUser);
     }
 
     public <T extends SecurityCheck> T createSecurityObject(Class<T> create) {
