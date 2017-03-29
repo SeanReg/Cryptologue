@@ -24,7 +24,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity android:name=".UI.HomepageActivity"
             android:theme="@style/AppTheme.Dark">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -83,9 +83,9 @@
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
             android:theme="@style/AppTheme.Dark"></activity>
-        <activity
+<!--        <activity
             android:name=".UI.HomepageActivity"
-            android:theme="@style/AppTheme.Dark"></activity>
+            android:theme="@style/AppTheme.Dark"></activity>-->
     </application>
 
 </manifest>

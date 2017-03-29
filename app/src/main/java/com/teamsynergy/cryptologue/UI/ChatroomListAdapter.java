@@ -1,6 +1,7 @@
 package com.teamsynergy.cryptologue.UI;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -52,6 +53,15 @@ public class ChatroomListAdapter extends BaseAdapter {
         TextView nameTextView = (TextView) rowView.findViewById(R.id.name);
         String name = (String) getItem(position);
         nameTextView.setText(name);
+
+        rowView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent Intent = new Intent(mContext, ChatroomActivity.class);
+                mContext.startActivity(Intent);
+            }
+        });
+
         return rowView;
     }
 }

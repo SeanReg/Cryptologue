@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(Intent);
         }
 
-/*        Button button = ((Button)findViewById(R.id.signupButton));
+        Button button = ((Button)findViewById(R.id.signupButton));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent Intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(Intent);
             }
-        });*/
+        });
 
         Button button3 = ((Button)findViewById(R.id.chatroomButton));
         button3.setOnClickListener(new View.OnClickListener() {

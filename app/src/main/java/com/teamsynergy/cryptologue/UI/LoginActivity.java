@@ -112,9 +112,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
-        Intent Intent = new Intent(getApplicationContext(), MessagingService.class);
-        startService(Intent);
-
         Toast.makeText(getBaseContext(), "LOG IN SUCCESSFUL.", Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
         finish();

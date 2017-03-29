@@ -68,7 +68,7 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        MessagingService.getInstance().socketSendMessage("Hello World - Android", "H8yPPTNu8W");
+        //MessagingService.getInstance().socketSendMessage("Hello World - Android", "H8yPPTNu8W");
     }
 
     private boolean sendChatMessage() {
