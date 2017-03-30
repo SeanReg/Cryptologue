@@ -11,6 +11,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,11 @@ import android.widget.Toast;
 import android.widget.ArrayAdapter;
 
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ParseInit;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.UserAccount;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +57,20 @@ public class HomepageActivity extends AppCompatActivity {
 
         ChatroomListAdapter adapter = new ChatroomListAdapter(this, mChatroomNameList);
         mListView.setAdapter(adapter);
+
+        UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
+        curAcc.getChatrooms(new UserAccount.Callbacks() {
+            @Override
+            public void onGotChatrooms(List<Chatroom> rooms) {
+                for (Chatroom room : rooms) {
+                    Log.d("Room", room.getName());
+                }
+            }
+        });
+
+/*        Chatroom.Builder cB = new Chatroom.Builder();
+        cB.setName("Tetst");
+        cB.build(true);*/
 
     }
 
