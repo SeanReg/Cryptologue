@@ -18,7 +18,7 @@ public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
 
     EditText _nameText;
-    EditText _emailText;
+    EditText _usernameText;
     EditText _passwordText;
     Button _signupButton;
     TextView _loginLink;
@@ -29,7 +29,7 @@ public class SignupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         _nameText = ((EditText)findViewById(R.id.input_name));
-        _emailText = ((EditText)findViewById(R.id.input_email));
+        _usernameText = ((EditText)findViewById(R.id.input_username));
         _passwordText = ((EditText)findViewById(R.id.input_password));
         _signupButton = ((Button)findViewById(R.id.btn_signup));
         _loginLink = ((TextView)findViewById(R.id.link_login));
@@ -66,12 +66,12 @@ public class SignupActivity extends AppCompatActivity {
         progressDialog.show();
 
         String name = _nameText.getText().toString();
-        String email = _emailText.getText().toString();
+        String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
         String phone = "9542549695";
 
         // TODO: Implement your own signup logic here.
-        AccountManager.getInstance().register(email, name, password, phone, new AccountManager.onAccountStatus() {
+        AccountManager.getInstance().register(username, name, password, phone, new AccountManager.onAccountStatus() {
             @Override
             public void onRegistered(UserAccount account) {
                 onSignupSuccess();
@@ -97,7 +97,7 @@ public class SignupActivity extends AppCompatActivity {
         boolean valid = true;
 
         String name = _nameText.getText().toString();
-        String email = _emailText.getText().toString();
+        String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
         if (name.isEmpty() || name.length() < 3) {
@@ -107,11 +107,11 @@ public class SignupActivity extends AppCompatActivity {
             _nameText.setError(null);
         }
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
+        if (username.isEmpty()) {
+            _usernameText.setError("enter a valid username");
             valid = false;
         } else {
-            _emailText.setError(null);
+            _usernameText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {

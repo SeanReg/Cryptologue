@@ -9,7 +9,8 @@
         android:id="@+id/chatroom_list"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:divider="@android:color/transparent">
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp">
     </ListView>
 
 
