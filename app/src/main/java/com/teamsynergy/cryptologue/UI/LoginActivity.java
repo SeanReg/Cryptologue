@@ -23,7 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
 
-    EditText _emailText;
+    EditText _usernameText;
     EditText _passwordText;
     Button _loginButton;
     TextView _signupLink;
@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        _emailText = ((EditText)findViewById(R.id.input_email));
+        _usernameText = ((EditText)findViewById(R.id.input_username));
         _passwordText = ((EditText)findViewById(R.id.input_password));
         _loginButton = ((Button)findViewById(R.id.btn_login));
         _signupLink = ((TextView)findViewById(R.id.link_signup));
@@ -72,11 +72,11 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        String email = _emailText.getText().toString();
+        String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
         // TODO: Implement your own authentication logic here.
-        AccountManager.getInstance().login(email, password, new AccountManager.onAccountStatus() {
+        AccountManager.getInstance().login(username, password, new AccountManager.onAccountStatus() {
             @Override
             public void onLogin(UserAccount account) {
                 // On complete call either onLoginSuccess or onLoginFailed
@@ -125,14 +125,14 @@ public class LoginActivity extends AppCompatActivity {
     public boolean validate() {
         boolean valid = true;
 
-        String email = _emailText.getText().toString();
+        String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _emailText.setError("enter a valid email address");
+        if (username.isEmpty()) {
+            _usernameText.setError("enter a valid username");
             valid = false;
         } else {
-            _emailText.setError(null);
+            _usernameText.setError(null);
         }
 
         if (password.isEmpty() || password.length() < 4 || password.length() > 10) {

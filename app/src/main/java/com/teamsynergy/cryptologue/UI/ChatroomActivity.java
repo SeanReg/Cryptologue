@@ -1,8 +1,11 @@
 package com.teamsynergy.cryptologue.UI;
 
+import android.app.ActionBar;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +28,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private ListView listView;
     private EditText chatText;
     private Button buttonSend;
+    private Toolbar toolbar;
     private boolean side = false;
 
     @Override
@@ -69,6 +73,9 @@ public class ChatroomActivity extends AppCompatActivity {
         });
 
         //MessagingService.getInstance().socketSendMessage("Hello World - Android", "H8yPPTNu8W");
+
+        Intent actionBarIntent = getIntent();
+        getSupportActionBar().setTitle(actionBarIntent.getStringExtra("Chatroom Name"));
     }
 
     private boolean sendChatMessage() {

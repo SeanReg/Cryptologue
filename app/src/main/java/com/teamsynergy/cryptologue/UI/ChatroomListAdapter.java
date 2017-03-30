@@ -58,6 +58,7 @@ public class ChatroomListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent Intent = new Intent(mContext, ChatroomActivity.class);
+                Intent.putExtra("Chatroom Name", "Chatroom A");
                 mContext.startActivity(Intent);
             }
         });

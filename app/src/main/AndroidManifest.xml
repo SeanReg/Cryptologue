@@ -82,7 +82,7 @@
         <activity
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
-            android:theme="@style/AppTheme.Dark"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
 <!--        <activity
             android:name=".UI.HomepageActivity"
             android:theme="@style/AppTheme.Dark"></activity>-->

@@ -10,11 +10,11 @@
         android:layout_marginTop="30dp"
         android:layout_gravity="end"
         android:orientation="horizontal"
-        android:gravity="end">
+        android:gravity="end"
+        android:weightSum="1">
 
-        <TextView
+        <com.teamsynergy.cryptologue.UI.TextLatoView
             android:id="@+id/msgr"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginEnd="10dp"
@@ -23,8 +23,10 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="5dp"
-            android:text="Sampleleft"
-            android:textColor="#000" />
+            android:text="My name is Nadeen and I'm testign the max width of this box, fuck this shit I don't know how to make it work"
+            android:textColor="#000"
+            android:maxWidth="300dp"
+            android:layout_width="wrap_content"/>
 
         <ImageView
             android:id="@+id/imageView6"
