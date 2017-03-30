@@ -25,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".UI.HomepageActivity"
-            android:theme="@style/AppTheme.Dark">
+            android:theme="@style/AppTheme.Dark.ActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
