@@ -33,7 +33,7 @@ import static android.app.PendingIntent.getActivity;
 
 public class HomepageActivity extends AppCompatActivity {
     private ListView mListView;
-    private ArrayList<String> mChatroomNameList = new ArrayList<>();
+    private ArrayList<Chatroom> mChatroomList = new ArrayList<>();
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,29 +45,29 @@ public class HomepageActivity extends AppCompatActivity {
         Intent sIntent = new Intent(getApplicationContext(), MessagingService.class);
         startService(sIntent);
 
-        if (AccountManager.getInstance().getCurrentAccount() == null) {
-            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(intent);
-        }
-
-
         mListView = (ListView) findViewById(R.id.chatroom_list);
 
 
-        final ChatroomListAdapter adapter = new ChatroomListAdapter(this, mChatroomNameList);
+        final ChatroomListAdapter adapter = new ChatroomListAdapter(this, mChatroomList);
         mListView.setAdapter(adapter);
 
-        UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
-        curAcc.getChatrooms(new UserAccount.Callbacks() {
-            @Override
-            public void onGotChatrooms(List<Chatroom> rooms) {
-                for (Chatroom room : rooms) {
-                    Log.d("Room", room.getName());
-                    mChatroomNameList.add(room.getName());
+        if (AccountManager.getInstance().getCurrentAccount() == null) {
+            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(intent);
+        } else {
+            UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
+            curAcc.getChatrooms(new UserAccount.Callbacks() {
+                @Override
+                public void onGotChatrooms(List<Chatroom> rooms) {
+                    for (Chatroom room : rooms) {
+                        Log.d("Room", room.getName());
+                        mChatroomList.add(room);
+                    }
+                    mListView.setAdapter(adapter);
                 }
-                mListView.setAdapter(adapter);
-            }
-        });
+            });
+        }
+
 
 /*        Chatroom.Builder cB = new Chatroom.Builder();
         cB.setName("Tetst");

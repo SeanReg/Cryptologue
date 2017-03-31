@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 
+import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.R;
 
 import java.util.ArrayList;
@@ -21,10 +22,10 @@ public class ChatroomListAdapter extends BaseAdapter {
 
     private Context mContext;
     private LayoutInflater mInflater;
-    private ArrayList<String> mDataSource;
+    private ArrayList<Chatroom> mDataSource;
 
 
-    public ChatroomListAdapter(Context context, ArrayList<String> rooms){
+    public ChatroomListAdapter(Context context, ArrayList<Chatroom> rooms){
         mContext = context;
         mDataSource = rooms;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -51,14 +52,15 @@ public class ChatroomListAdapter extends BaseAdapter {
     public View getView(int position, View view, ViewGroup parent) {
         View rowView = mInflater.inflate(R.layout.cardlayout, parent, false);
         TextView nameTextView = (TextView) rowView.findViewById(R.id.roomName);
-        String name = (String) getItem(position);
+        final Chatroom room = (Chatroom) getItem(position);
+        final String name = room.getName();
         nameTextView.setText(name);
 
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent Intent = new Intent(mContext, ChatroomActivity.class);
-                Intent.putExtra("Chatroom Name", "Chatroom A");
+                Intent.putExtra("chatroom", room);
                 mContext.startActivity(Intent);
             }
         });

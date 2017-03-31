@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 
+import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
@@ -31,6 +32,8 @@ public class ChatroomActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private boolean side = false;
 
+    private Chatroom mChatroom = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +43,9 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonSend = (Button) findViewById(R.id.send);
 
         listView = (ListView) findViewById(R.id.msgview);
+
+        Intent roomIntent = getIntent();
+        mChatroom = (Chatroom)roomIntent.getParcelableExtra("chatroom");
 
         chatArrayAdapter = new ChatArrayAdapter(getApplicationContext(), R.layout.right);
         listView.setAdapter(chatArrayAdapter);
@@ -74,12 +80,12 @@ public class ChatroomActivity extends AppCompatActivity {
 
         //MessagingService.getInstance().socketSendMessage("Hello World - Android", "H8yPPTNu8W");
 
-        Intent actionBarIntent = getIntent();
-        getSupportActionBar().setTitle(actionBarIntent.getStringExtra("Chatroom Name"));
+        getSupportActionBar().setTitle(mChatroom.getName());
     }
 
     private boolean sendChatMessage() {
         chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString()));
+        MessagingService.getInstance().socketSendMessage(chatText.getText().toString(), mChatroom.getId());
         chatText.setText("");
         side = !side;
         return true;

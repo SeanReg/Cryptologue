@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import de.tavendo.autobahn.WebSocket;
 import de.tavendo.autobahn.WebSocketConnection;
@@ -28,6 +29,9 @@ public class MessagingService extends Service {
     private MessageListener mMessageListener = null;
 
     private static MessagingService mServiceInstance = null;
+
+    private UserAccount mCurAccount = null;
+    private List<Chatroom> mChatrooms = null;
 
     public interface  MessageListener {
         public void onMessageRecieved(String s);
@@ -50,6 +54,12 @@ public class MessagingService extends Service {
     }
 
     public void connectSocket() throws WebSocketException {
+        ParseInit.start(this);
+
+        mCurAccount = AccountManager.getInstance().getCurrentAccount();
+        if (mCurAccount == null)
+            throw new WebSocketException("No current account!");
+
         mSocket = new WebSocketConnection();
 
         URI server = null;
@@ -99,14 +109,14 @@ public class MessagingService extends Service {
         mMessageListener = listener;
     }
 
-    public void socketSendMessage(String msg, String chatroom) {
+    public void socketSendMessage(String msg, String chatroomId) {
         try {
             checkConnection();
 
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("mType", MESSAGE_TYPE_SEND_CHAT);
-                jsonObject.put("chatroomId", chatroom);
+                jsonObject.put("chatroomId", chatroomId);
                 jsonObject.put("msg", msg);
 
                 mSocket.sendTextMessage(jsonObject.toString());
