@@ -54,7 +54,8 @@ public class ChatroomActivity extends AppCompatActivity {
         chatText.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    return sendChatMessage();
+                    sendChatMessage();
+                    return true;
                 }
                 return false;
             }
@@ -78,16 +79,24 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        //MessagingService.getInstance().socketSendMessage("Hello World - Android", "H8yPPTNu8W");
-
         getSupportActionBar().setTitle(mChatroom.getName());
+
+        MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
+            @Override
+            public void onMessageRecieved(String s) {
+                addChatMessage(s, false);
+            }
+        });
     }
 
-    private boolean sendChatMessage() {
-        chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString()));
-        MessagingService.getInstance().socketSendMessage(chatText.getText().toString(), mChatroom.getId());
+    private void sendChatMessage() {
+        String msg = chatText.getText().toString();
+        mChatroom.sendMessage(msg);
+        addChatMessage(msg, true);
         chatText.setText("");
-        side = !side;
-        return true;
+    }
+
+    private void addChatMessage(String msg, boolean isSender) {
+        chatArrayAdapter.add(new ChatMessage(isSender, msg));
     }
 }

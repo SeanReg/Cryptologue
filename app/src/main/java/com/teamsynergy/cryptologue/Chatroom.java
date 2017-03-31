@@ -25,8 +25,12 @@ public class Chatroom implements SecurityCheck, Parcelable {
         return mName;
     }
 
-    public String getId() {
-        return mParseObj.getObjectId();
+    public void sendMessage(String str) {
+        MessagingService.getInstance().socketSendMessage(str, mParseObj.getObjectId());
+    }
+
+    public void setMessageListener() {
+
     }
 
     private final SaveCallback mCreatedCallback = new SaveCallback() {
