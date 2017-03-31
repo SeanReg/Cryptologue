@@ -52,10 +52,9 @@ public class HomepageActivity extends AppCompatActivity {
 
 
         mListView = (ListView) findViewById(R.id.chatroom_list);
-        prepChatroomData();
 
 
-        ChatroomListAdapter adapter = new ChatroomListAdapter(this, mChatroomNameList);
+        final ChatroomListAdapter adapter = new ChatroomListAdapter(this, mChatroomNameList);
         mListView.setAdapter(adapter);
 
         UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
@@ -64,7 +63,9 @@ public class HomepageActivity extends AppCompatActivity {
             public void onGotChatrooms(List<Chatroom> rooms) {
                 for (Chatroom room : rooms) {
                     Log.d("Room", room.getName());
+                    mChatroomNameList.add(room.getName());
                 }
+                mListView.setAdapter(adapter);
             }
         });
 
@@ -72,13 +73,6 @@ public class HomepageActivity extends AppCompatActivity {
         cB.setName("Tetst");
         cB.build(true);*/
 
-    }
-
-    private void prepChatroomData(){
-        String name = "test";
-        for (int i = 1; i <= 18; ++i) {
-            mChatroomNameList.add(name + Integer.toString(i));
-        }
     }
 
 

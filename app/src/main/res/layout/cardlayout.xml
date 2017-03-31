@@ -7,7 +7,7 @@
         android:foreground="?android:attr/selectableItemBackground">
 
         <com.teamsynergy.cryptologue.UI.TextLatoView
-            android:id="@+id/name"
+            android:id="@+id/roomName"
             android:textColor="@android:color/darker_gray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

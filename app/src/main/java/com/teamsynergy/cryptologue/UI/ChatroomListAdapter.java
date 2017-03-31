@@ -50,7 +50,7 @@ public class ChatroomListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         View rowView = mInflater.inflate(R.layout.cardlayout, parent, false);
-        TextView nameTextView = (TextView) rowView.findViewById(R.id.name);
+        TextView nameTextView = (TextView) rowView.findViewById(R.id.roomName);
         String name = (String) getItem(position);
         nameTextView.setText(name);
 
