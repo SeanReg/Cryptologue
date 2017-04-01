@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <permission
         android:name="com.teamsynergy.cryptologue.permission.C2D_MESSAGE"
@@ -82,6 +83,8 @@
         <activity
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
+            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
+        <activity android:name=".UI.CreateChatroomActivity"
             android:theme="@style/AppTheme.Dark.ActionBar"></activity>
 <!--        <activity
             android:name=".UI.HomepageActivity"
