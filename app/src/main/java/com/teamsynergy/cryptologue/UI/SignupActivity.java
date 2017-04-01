@@ -3,6 +3,7 @@ package com.teamsynergy.cryptologue.UI;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ public class SignupActivity extends AppCompatActivity {
     EditText _nameText;
     EditText _usernameText;
     EditText _passwordText;
+    EditText _phoneNumberText;
     Button _signupButton;
     TextView _loginLink;
 
@@ -31,6 +33,7 @@ public class SignupActivity extends AppCompatActivity {
         _nameText = ((EditText)findViewById(R.id.input_name));
         _usernameText = ((EditText)findViewById(R.id.input_username));
         _passwordText = ((EditText)findViewById(R.id.input_password));
+        _phoneNumberText = ((EditText)findViewById(R.id.input_phonenumber));
         _signupButton = ((Button)findViewById(R.id.btn_signup));
         _loginLink = ((TextView)findViewById(R.id.link_login));
 
@@ -68,7 +71,7 @@ public class SignupActivity extends AppCompatActivity {
         String name = _nameText.getText().toString();
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
-        String phone = "9542549695";
+        String phone = PhoneNumberUtils.formatNumberToE164(_phoneNumberText.getText().toString(), "US");
 
         // TODO: Implement your own signup logic here.
         AccountManager.getInstance().register(username, name, password, phone, new AccountManager.onAccountStatus() {
