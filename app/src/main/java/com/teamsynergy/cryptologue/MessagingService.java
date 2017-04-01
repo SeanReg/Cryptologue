@@ -34,7 +34,7 @@ public class MessagingService extends Service {
     private List<Chatroom> mChatrooms = null;
 
     public interface  MessageListener {
-        public void onMessageRecieved(String s);
+        public void onMessageRecieved(Message s);
     }
 
     @Override
@@ -69,40 +69,7 @@ public class MessagingService extends Service {
             e.printStackTrace();
         }
 
-        mSocket.connect(server, new WebSocket.WebSocketConnectionObserver() {
-            @Override
-            public void onOpen() {
-                Log.d("Socket", "Connected to Server!");
-                try {
-                    socketIdentify();
-                } catch (WebSocketClosedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onClose(WebSocketCloseNotification webSocketCloseNotification, String s) {
-                Log.d("Socket", "Disconnected from Server!");
-            }
-
-            @Override
-            public void onTextMessage(String s) {
-                if (mMessageListener != null)
-                    mMessageListener.onMessageRecieved(s);
-
-                Log.d("Socket", "Got message " + s);
-            }
-
-            @Override
-            public void onRawTextMessage(byte[] bytes) {
-
-            }
-
-            @Override
-            public void onBinaryMessage(byte[] bytes) {
-
-            }
-        });
+        mSocket.connect(server, mSocketObserver);
     }
 
     public void setMessagingListener(MessageListener listener) {
@@ -160,4 +127,39 @@ public class MessagingService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+    private final WebSocket.WebSocketConnectionObserver mSocketObserver = new WebSocket.WebSocketConnectionObserver() {
+        @Override
+        public void onOpen() {
+            Log.d("Socket", "Connected to Server!");
+            try {
+                socketIdentify();
+            } catch (WebSocketClosedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onClose(WebSocket.WebSocketConnectionObserver.WebSocketCloseNotification webSocketCloseNotification, String s) {
+            Log.d("Socket", "Disconnected from Server!");
+        }
+
+        @Override
+        public void onTextMessage(String s) {
+            if (mMessageListener != null)
+                mMessageListener.onMessageRecieved(new Message(s));
+
+            Log.d("Socket", "Got message " + s);
+        }
+
+        @Override
+        public void onRawTextMessage(byte[] bytes) {
+
+        }
+
+        @Override
+        public void onBinaryMessage(byte[] bytes) {
+
+        }
+    };
 }

@@ -12,19 +12,19 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
+public class ChatArrayAdapter extends ArrayAdapter<ChatMessageBubble> {
 
     private TextView chatText;
-    private List<ChatMessage> chatMessageList = new ArrayList<ChatMessage>();
+    private List<ChatMessageBubble> ChatMessageBubbleList = new ArrayList<ChatMessageBubble>();
     private Context context;
 
     private LayoutInflater inflater = (LayoutInflater) this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
     @Override
-    public void add(ChatMessage object) {
+    public void add(ChatMessageBubble object) {
         object.mView = null;
 
-        chatMessageList.add(object);
+        ChatMessageBubbleList.add(object);
         super.add(object);
     }
 
@@ -34,15 +34,15 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
     }
 
     public int getCount() {
-        return this.chatMessageList.size();
+        return this.ChatMessageBubbleList.size();
     }
 
-    public ChatMessage getItem(int index) {
-        return this.chatMessageList.get(index);
+    public ChatMessageBubble getItem(int index) {
+        return this.ChatMessageBubbleList.get(index);
     }
 
     public View getView(int position, View row, ViewGroup parent) {
-        ChatMessage object = getItem(position);
+        ChatMessageBubble object = getItem(position);
 
         if (object.mView == null) {
             if (object.left) {

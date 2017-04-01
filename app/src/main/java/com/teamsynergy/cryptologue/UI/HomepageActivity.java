@@ -32,9 +32,12 @@ import java.util.List;
 import static android.app.PendingIntent.getActivity;
 
 public class HomepageActivity extends AppCompatActivity {
+    private final static int RESULT_LOGGED_IN = 1;
+
     private ListView mListView;
     private ArrayList<Chatroom> mChatroomList = new ArrayList<>();
 
+    private ChatroomListAdapter mChatroomAdapter = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,24 +51,14 @@ public class HomepageActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.chatroom_list);
 
 
-        final ChatroomListAdapter adapter = new ChatroomListAdapter(this, mChatroomList);
-        mListView.setAdapter(adapter);
+        mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList);
+        mListView.setAdapter(mChatroomAdapter);
 
         if (AccountManager.getInstance().getCurrentAccount() == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, RESULT_LOGGED_IN);
         } else {
-            UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
-            curAcc.getChatrooms(new UserAccount.Callbacks() {
-                @Override
-                public void onGotChatrooms(List<Chatroom> rooms) {
-                    for (Chatroom room : rooms) {
-                        Log.d("Room", room.getName());
-                        mChatroomList.add(room);
-                    }
-                    mListView.setAdapter(adapter);
-                }
-            });
+            updateChatrooms();
         }
 
 
@@ -75,5 +68,28 @@ public class HomepageActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == RESULT_LOGGED_IN) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                updateChatrooms();
+            }
+        }
+    }
 
+    public void updateChatrooms() {
+        UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
+        curAcc.getChatrooms(new UserAccount.Callbacks() {
+            @Override
+            public void onGotChatrooms(List<Chatroom> rooms) {
+                for (Chatroom room : rooms) {
+                    Log.d("Room", room.getName());
+                    mChatroomList.add(room);
+                }
+                mListView.setAdapter(mChatroomAdapter);
+            }
+        });
+    }
 }

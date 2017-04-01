@@ -9,6 +9,8 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.util.ArrayList;
+
 /**
  * Created by Sean on 3/29/2017.
  */
@@ -16,6 +18,7 @@ import com.parse.SaveCallback;
 public class Chatroom implements SecurityCheck, Parcelable {
     private String mName = "";
     private ParseObject mParseObj = null;
+    private ArrayList<User> mMembers = new ArrayList<>();
 
     private Chatroom() {
 
@@ -25,12 +28,19 @@ public class Chatroom implements SecurityCheck, Parcelable {
         return mName;
     }
 
-    public void sendMessage(String str) {
-        MessagingService.getInstance().socketSendMessage(str, mParseObj.getObjectId());
+    public void sendMessage(Message msg) {
+        MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
     }
 
-    public void setMessageListener() {
+    public void setMessageListener(MessagingService.MessageListener listener) {
+        MessagingService.getInstance().setMessagingListener(listener);
+    }
 
+    public void inviteUser(User inv) {
+        ParseObject obj = new ParseObject("RoomLookup");
+        obj.put("user", inv.getParseUser());
+        obj.put("chatroom", mParseObj);
+        obj.saveInBackground();
     }
 
     private final SaveCallback mCreatedCallback = new SaveCallback() {
@@ -40,12 +50,9 @@ public class Chatroom implements SecurityCheck, Parcelable {
                 invalidate();
                 e.printStackTrace();
             } else {
-                ParseUser curUser = AccountManager.getInstance().getCurrentAccount().getParseUser();
-
-                ParseObject lookup = new ParseObject("RoomLookup");
-                lookup.put("user", curUser);
-                lookup.put("chatroom", mParseObj);
-                lookup.saveInBackground();
+                for (User member : mMembers) {
+                    inviteUser(member);
+                }
             }
         }
     };
@@ -97,14 +104,26 @@ public class Chatroom implements SecurityCheck, Parcelable {
                 mChatroom.mParseObj = parseObj;
         }
 
+        public void addMember(User member) {
+            if (mChatroom != null) {
+                for (User usr : mChatroom.mMembers) {
+                    if (usr.getUsername().equals(member.getUsername()))
+                        return;
+                }
+                mChatroom.mMembers.add(member);
+            }
+        }
+
         public Chatroom build(boolean isNew) {
             if (isNew && mChatroom != null) {
-                ParseUser curUser = AccountManager.getInstance().getCurrentAccount().getParseUser();
+                UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
+
+                addMember(curUser);
 
                 ParseObject room = new ParseObject("Chatrooms");
                 mChatroom.mParseObj = room;
                 room.put("name", mChatroom.mName);
-                room.getRelation("members").add(curUser);
+                room.getRelation("members").add(curUser.getParseUser());
                 room.saveInBackground(mChatroom.mCreatedCallback);
             }
 
