@@ -40,6 +40,8 @@ public class HomepageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
 
+
+
         ParseInit.start(this);
 
         Intent sIntent = new Intent(getApplicationContext(), MessagingService.class);
@@ -72,6 +74,8 @@ public class HomepageActivity extends AppCompatActivity {
 /*        Chatroom.Builder cB = new Chatroom.Builder();
         cB.setName("Tetst");
         cB.build(true);*/
+
+
 
     }
 
