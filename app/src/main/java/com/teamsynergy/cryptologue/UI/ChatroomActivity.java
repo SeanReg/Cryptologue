@@ -19,12 +19,12 @@ import android.widget.ListView;
 
 
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.ChatMessageBubble;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.Message;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
-import com.teamsynergy.cryptologue.ChatMessage;
-
 
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -85,10 +85,10 @@ public class ChatroomActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(mChatroom.getName());
 
-        MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
+        mChatroom.setMessageListener(new MessagingService.MessageListener() {
             @Override
-            public void onMessageRecieved(String s) {
-                addChatMessage(s, false);
+            public void onMessageRecieved(Message msg) {
+                addChatMessage(msg.getText(), false);
             }
         });
     }
@@ -124,12 +124,12 @@ public class ChatroomActivity extends AppCompatActivity {
 
     private void sendChatMessage() {
         String msg = chatText.getText().toString();
-        mChatroom.sendMessage(msg);
+        mChatroom.sendMessage(new Message(msg));
         addChatMessage(msg, true);
         chatText.setText("");
     }
 
     private void addChatMessage(String msg, boolean isSender) {
-        chatArrayAdapter.add(new ChatMessage(isSender, msg));
+        chatArrayAdapter.add(new ChatMessageBubble(isSender, msg));
     }
 }

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <permission
         android:name="com.teamsynergy.cryptologue.permission.C2D_MESSAGE"
@@ -76,24 +77,23 @@
         <activity
             android:name=".UI.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme.Dark"></activity>
         <activity
             android:name=".UI.SignupActivity"
             android:label="@string/title_activity_signup"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme.Dark"></activity>
         <activity
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
-        <!--
-            <activity
-            android:name=".UI.HomepageActivity"
-            android:theme="@style/AppTheme.Dark"></activity>
-        -->
+            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
+
+        <activity android:name=".UI.SelectContactsActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
+
         <activity
             android:name=".UI.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
         <activity
             android:name=".UI.CreateChatroomActivity"
             android:label="@string/title_activity_create_chatroom"

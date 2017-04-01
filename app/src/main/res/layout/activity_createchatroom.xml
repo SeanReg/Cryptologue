@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+        <com.teamsynergy.cryptologue.UI.EditLatoText android:id="@+id/chatroom_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords"
+            android:hint="Chatroom Name" />
+    </android.support.design.widget.TextInputLayout>
+
+    <ListView
+        android:id="@+id/create_chatroom"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:divider="@android:drawable/divider_horizontal_bright"
+        android:dividerHeight="1dp">
+    </ListView>
+
+</LinearLayout>
