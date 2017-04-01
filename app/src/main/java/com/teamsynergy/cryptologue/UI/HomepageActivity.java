@@ -3,21 +3,11 @@ package com.teamsynergy.cryptologue.UI;
 /**
  * Created by MatthewRedington on 3/26/17.
  */
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
-import android.widget.ArrayAdapter;
 
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
@@ -43,8 +33,6 @@ public class HomepageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
 
-
-
         ParseInit.start(this);
 
         Intent sIntent = new Intent(getApplicationContext(), MessagingService.class);
@@ -62,6 +50,9 @@ public class HomepageActivity extends AppCompatActivity {
         } else {
             updateChatrooms();
         }
+
+        Intent intent = new Intent(getApplicationContext(), SelectContactsActivity.class);
+        startActivity(intent);
 
 
 /*        Chatroom.Builder cB = new Chatroom.Builder();
