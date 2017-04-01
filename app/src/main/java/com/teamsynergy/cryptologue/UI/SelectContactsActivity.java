@@ -8,31 +8,38 @@ import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
+import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.User;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by MatthewRedington on 3/31/17.
  */
 
 public class SelectContactsActivity extends AppCompatActivity {
+    private Button mInviteButton;
     private ListView mListView;
     private ArrayList<Pair<String, String>> mContactList = new ArrayList<>();
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_selectcontacts);
 
         mListView = (ListView) findViewById(R.id.create_chatroom);
-
-
+        mInviteButton = (Button) findViewById(R.id.invite);
 
         final SelectContactsAdapter adapter = new SelectContactsAdapter(this, mContactList);
         mListView.setAdapter(adapter);
@@ -69,8 +76,31 @@ public class SelectContactsActivity extends AppCompatActivity {
 
         mListView.setAdapter(adapter);
 
+        mInviteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<String> numbers = new ArrayList<String>();
+                List<Pair<String, String>> selected = adapter.getCheckedContacts();
+                for (Pair<String, String> sel : selected) {
+                    numbers.add(sel.second);
+                }
+
+                User.findByPhoneNumber(numbers, new User.UsersFoundListener() {
+                    @Override
+                    public void onUsersFound(List<User> users) {
+                        Chatroom.Builder builder = new Chatroom.Builder();
+                        builder.setName(getIntent().getStringExtra("Chatroom name"));
+                        for (User usr : users) {
+                            builder.addMember(usr);
+                        }
+                        builder.build(true);
+                        finish();
+                    }
+                });
+
+            }
+        });
+
+        getSupportActionBar().setTitle("Selects contacts...");
     }
-
-
-
 }

@@ -1,6 +1,5 @@
 package com.teamsynergy.cryptologue.UI;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.Bundle;
@@ -11,12 +10,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-
 
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.ChatMessageBubble;

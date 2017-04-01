@@ -115,7 +115,7 @@ public class SettingsActivity extends AppCompatActivity {
             _usernameText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
+        if ((password.length() < 4 && !password.isEmpty()) || password.length() > 10) {
             _passwordText.setError("between 4 and 10 alphanumeric characters");
             valid = false;
         } else {

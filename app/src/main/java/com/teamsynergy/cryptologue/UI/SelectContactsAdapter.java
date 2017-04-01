@@ -62,6 +62,7 @@ public class SelectContactsAdapter extends BaseAdapter {
         TextView nameTextView = (TextView) rowView.findViewById(R.id.contactName);
         TextView numberTextView = (TextView) rowView.findViewById(R.id.contactNumber);
         CheckBox cBox = ((CheckBox)rowView.findViewById(R.id.checkBox));
+        cBox.setOnClickListener(mContactClicked);
         final Pair<String, String> contact = (Pair<String, String>) getItem(position);
         final String name = contact.first;
         final String number = contact.second;
@@ -74,6 +75,7 @@ public class SelectContactsAdapter extends BaseAdapter {
         }
 
         rowView.setTag(contact);
+        cBox.setTag(contact);
 
         return rowView;
     }
@@ -82,11 +84,11 @@ public class SelectContactsAdapter extends BaseAdapter {
         return new ArrayList<>(mSelectedContacts);
     }
 
-    private final View.OnClickListener mContactClicked = new View.OnClickListener() {
+    private final ViewGroup.OnClickListener mContactClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             CheckBox cBox = ((CheckBox)v.findViewById(R.id.checkBox));
-            cBox.setChecked(!cBox.isChecked());
+            if (cBox != v) cBox.setChecked(!cBox.isChecked());
 
             Pair<String, String> contact = ((Pair<String, String>)v.getTag());
             mSelectedMap.put(contact.second, cBox.isChecked());

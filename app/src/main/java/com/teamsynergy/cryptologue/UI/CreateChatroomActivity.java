@@ -59,8 +59,9 @@ public class CreateChatroomActivity extends AppCompatActivity {
     }
 
     public void next() {
-//        Intent intentSettings = new Intent(this, ContactsActivity.class);
-//        startActivity(intentSettings);
+        Intent contactsIntent = new Intent(this, SelectContactsActivity.class);
+        contactsIntent.putExtra("Chatroom name", _nameText.getText().toString());
+        startActivity(contactsIntent);
         // send name and photo
     }
 
