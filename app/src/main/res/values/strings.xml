@@ -16,4 +16,6 @@
     </string>
     <string name="title_activity_signup">SignupActivity</string>
     <string name="title_activity_chatroom">ChatroomActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_create_chatroom">CreateChatroomActivity</string>
 </resources>

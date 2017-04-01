@@ -1,9 +1,13 @@
 package com.teamsynergy.cryptologue;
 
+import android.content.Intent;
+
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
+import com.teamsynergy.cryptologue.UI.LoginActivity;
 
 import java.lang.reflect.Array;
 import java.security.Security;
@@ -121,6 +125,32 @@ public class AccountManager {
         }
     }
 
+    public void updateAccount(String username, String displayName, String password, String phone, final onAccountStatus callback) {
+        ParseUser user = ParseUser.getCurrentUser();
+        //user.setEmail(username);
+        //Lower case the username so that usernames for login are not case sensistive
+        user.setUsername(username.toLowerCase());
+        if(!password.equals("")) { user.setPassword(password); };
+        user.put(FIELD_DISPLAY_NAME, displayName);
+        user.put(FIELD_PHONE_NUMBER, phone);
+        //Save a correctly cased version of the username for display purposes
+        user.put(FIELD_USERNAME_CASE, username);
+
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (callback != null) {
+                    if (e == null) {
+                        constructCurrentAccount();
+                        callback.onSave();
+                    } else {
+                        callback.onSaveError(e);
+                    }
+                }
+            }
+        });
+    }
+
     private void constructCurrentAccount() {
         ParseUser pUser = ParseUser.getCurrentUser();
         mCurAccount = new UserAccount(pUser.getUsername(), (String)pUser.get("displayName"), (String)pUser.get("phone"), pUser);
@@ -186,5 +216,9 @@ public class AccountManager {
          * @param e contains the ParseException and reason that the the registration failed
          */
         public void onRegistrationError(ParseException e) {};
+
+        public void onSave() {};
+
+        public void onSaveError(ParseException e) {};
     }
 }

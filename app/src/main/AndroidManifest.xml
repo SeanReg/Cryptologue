@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <permission
         android:name="com.teamsynergy.cryptologue.permission.C2D_MESSAGE"
@@ -24,7 +25,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UI.HomepageActivity"
+        <activity
+            android:name=".UI.HomepageActivity"
             android:theme="@style/AppTheme.Dark.ActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -82,10 +84,20 @@
         <activity
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
-<!--        <activity
+            android:theme="@style/AppTheme.Dark.ActionBar" />
+        <!--
+            <activity
             android:name=".UI.HomepageActivity"
-            android:theme="@style/AppTheme.Dark"></activity>-->
+            android:theme="@style/AppTheme.Dark"></activity>
+        -->
+        <activity
+            android:name=".UI.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.Dark.ActionBar" />
+        <activity
+            android:name=".UI.CreateChatroomActivity"
+            android:label="@string/title_activity_create_chatroom"
+            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
     </application>
 
 </manifest>

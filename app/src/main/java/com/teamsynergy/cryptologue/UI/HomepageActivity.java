@@ -13,6 +13,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -73,6 +76,35 @@ public class HomepageActivity extends AppCompatActivity {
         cB.setName("Tetst");
         cB.build(true);*/
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_overflow, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.newChat:
+                Intent intentNewChat = new Intent(this, CreateChatroomActivity.class);
+                startActivity(intentNewChat);
+                return true;
+            case R.id.settings:
+                Intent intentSettings = new Intent(this, SettingsActivity.class);
+                startActivity(intentSettings);
+                return true;
+            case R.id.logout:
+                AccountManager.getInstance().logout();
+                Intent intentLogout = new Intent(this, LoginActivity.class);
+                startActivity(intentLogout);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 

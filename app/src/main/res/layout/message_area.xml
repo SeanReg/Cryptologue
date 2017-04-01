@@ -13,7 +13,9 @@
         android:textColorHint="#CFD8DC"
         android:textColor="@color/black"
         android:hint="Write a message"
-        android:id="@+id/msg" />
+        android:id="@+id/msg"
+        android:textCursorDrawable="@null"
+        android:inputType="textCapSentences"/>
 
     <Button
         android:layout_width="42dp"

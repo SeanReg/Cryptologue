@@ -147,7 +147,7 @@ public class MessagingService extends Service {
         if (mSocket == null || !mSocket.isConnected())
             throw new WebSocketClosedException("WebSocket not connected!");
     }
-    
+
     private class WebSocketClosedException extends WebSocketException {
         public WebSocketClosedException(String message) {
             super(message);

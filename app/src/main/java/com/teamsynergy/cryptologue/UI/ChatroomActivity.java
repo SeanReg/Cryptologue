@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -15,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 
+import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.R;
@@ -87,6 +91,35 @@ public class ChatroomActivity extends AppCompatActivity {
                 addChatMessage(s, false);
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_overflow, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.newChat:
+                Intent intentNewChat = new Intent(this, CreateChatroomActivity.class);
+                startActivity(intentNewChat);
+                return true;
+            case R.id.settings:
+                Intent intentSettings = new Intent(this, SettingsActivity.class);
+                startActivity(intentSettings);
+                return true;
+            case R.id.logout:
+                AccountManager.getInstance().logout();
+                Intent intentLogout = new Intent(this, LoginActivity.class);
+                startActivity(intentLogout);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void sendChatMessage() {
