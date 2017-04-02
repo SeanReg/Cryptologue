@@ -10,6 +10,8 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Sean on 3/29/2017.
@@ -37,10 +39,18 @@ public class Chatroom implements SecurityCheck, Parcelable {
     }
 
     public void inviteUser(User inv) {
-        ParseObject obj = new ParseObject("RoomLookup");
-        obj.put("user", inv.getParseUser());
-        obj.put("chatroom", mParseObj);
-        obj.saveInBackground();
+        inviteUsers(Arrays.asList(inv));
+    }
+
+    public void inviteUsers(List<User> inv) {
+        ArrayList<ParseObject> invObjs = new ArrayList<>();
+        for (User usr : inv) {
+            ParseObject obj = new ParseObject("RoomLookup");
+            obj.put("user", usr.getParseUser());
+            obj.put("chatroom", mParseObj);
+            invObjs.add(obj);
+        }
+        ParseObject.saveAllInBackground(invObjs);
     }
 
     private static class ChatroomSaved implements SaveCallback {
@@ -58,9 +68,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
                 mChatroom.invalidate();
                 e.printStackTrace();
             } else {
-                for (User member : mChatroom.mMembers) {
-                    mChatroom.inviteUser(member);
-                }
+                mChatroom.inviteUsers(mChatroom.mMembers);
                 if (mBuiltListener != null)
                     mBuiltListener.onChatroomBuilt(mChatroom);
             }
@@ -81,11 +89,11 @@ public class Chatroom implements SecurityCheck, Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mName);
+        dest.writeList(mMembers);
         dest.writeString(mParseObj.getObjectId());
     }
 
-    public static final Parcelable.Creator<Chatroom> CREATOR
-            = new Parcelable.Creator<Chatroom>() {
+    public static final Parcelable.Creator<Chatroom> CREATOR = new Parcelable.Creator<Chatroom>() {
         public Chatroom createFromParcel(Parcel in) {
             return new Chatroom(in);
         }
@@ -97,6 +105,8 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
     private Chatroom(Parcel in) {
         mName = in.readString();
+        in.readList(mMembers, null);
+
         mParseObj = new ParseObject("Chatrooms");
         mParseObj.setObjectId(in.readString());
     }
