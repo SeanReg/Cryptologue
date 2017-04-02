@@ -1,5 +1,6 @@
 package com.teamsynergy.cryptologue.UI;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,11 +21,18 @@ import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.User;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class CreateChatroomActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMG = 1;
+    private static int RESULT_SELECT_CONTACTS = 2;
     String imgDecodableString;
 
     EditText _nameText;
@@ -61,7 +69,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
     public void next() {
         Intent contactsIntent = new Intent(this, SelectContactsActivity.class);
         contactsIntent.putExtra("Chatroom name", _nameText.getText().toString());
-        startActivity(contactsIntent);
+        startActivityForResult(contactsIntent, RESULT_SELECT_CONTACTS);
         // send name and photo
     }
 
@@ -78,30 +86,55 @@ public class CreateChatroomActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK
-                    && null != data) {
-                // Get the Image from data
+            if (requestCode == RESULT_LOAD_IMG) {
+                if (resultCode == RESULT_OK && null != data) {
+                    // Get the Image from data
 
-                Uri selectedImage = data.getData();
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-                // Get the cursor
-                Cursor cursor = getContentResolver().query(selectedImage,
-                        filePathColumn, null, null, null);
-                // Move to first row
-                cursor.moveToFirst();
+                    // Get the cursor
+                    Cursor cursor = getContentResolver().query(selectedImage,
+                            filePathColumn, null, null, null);
+                    // Move to first row
+                    cursor.moveToFirst();
 
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                imgDecodableString = cursor.getString(columnIndex);
-                cursor.close();
-                ImageView imgView = (ImageView) findViewById(R.id.chatAvatar);
-                // Set the Image in ImageView after decoding the String
-                imgView.setImageBitmap(BitmapFactory
-                        .decodeFile(imgDecodableString));
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    imgDecodableString = cursor.getString(columnIndex);
+                    cursor.close();
+                    ImageView imgView = (ImageView) findViewById(R.id.chatAvatar);
+                    // Set the Image in ImageView after decoding the String
+                    imgView.setImageBitmap(BitmapFactory
+                            .decodeFile(imgDecodableString));
 
-            } else {
-                Toast.makeText(this, "You haven't picked an image",
-                        Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "You haven't picked an image",
+                            Toast.LENGTH_LONG).show();
+                }
+            } else if (requestCode == RESULT_SELECT_CONTACTS) {
+                if (resultCode == RESULT_OK) {
+                    String[] numbers = data.getStringArrayExtra("selectedNumbers");
+                    User.findByPhoneNumber(Arrays.asList(numbers), new User.UsersFoundListener() {
+                        @Override
+                        public void onUsersFound(List<User> users) {
+                            Chatroom.Builder builder = new Chatroom.Builder();
+                            builder.setName(_nameText.getText().toString());
+                            for (User usr : users) {
+                                builder.addMember(usr);
+                            }
+                            builder.build(true, new Chatroom.BuiltListener() {
+                                @Override
+                                public void onChatroomBuilt(Chatroom room) {
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("chatroom", room);
+                                    setResult(Activity.RESULT_OK, resultIntent);
+                                    finish();
+                                }
+                            });
+
+                        }
+                    });
+                }
             }
         } catch (Exception e) {
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)

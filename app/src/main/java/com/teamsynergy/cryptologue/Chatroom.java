@@ -56,17 +56,27 @@ public class Chatroom implements SecurityCheck, Parcelable {
         ParseObject.saveAllInBackground(invObjs);
     }
 
-    private final SaveCallback mCreatedCallback = new SaveCallback() {
+    private static class ChatroomSaved implements SaveCallback {
+        private final BuiltListener mBuiltListener;
+        private final Chatroom mChatroom;
+
+        public ChatroomSaved(Chatroom room, BuiltListener listener) {
+            mBuiltListener = listener;
+            mChatroom = room;
+        }
+
         @Override
         public void done(ParseException e) {
             if (e != null) {
-                invalidate();
+                mChatroom.invalidate();
                 e.printStackTrace();
             } else {
-                inviteUsers(mMembers);
+                mChatroom.inviteUsers(mChatroom.mMembers);
+                if (mBuiltListener != null)
+                    mBuiltListener.onChatroomBuilt(mChatroom);
             }
         }
-    };
+    }
 
 
     @Override
@@ -127,7 +137,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
             }
         }
 
-        public Chatroom build(boolean isNew) {
+        public Chatroom build(boolean isNew, BuiltListener listener) {
             if (isNew && mChatroom != null) {
                 UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
 
@@ -137,7 +147,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
                 mChatroom.mParseObj = room;
                 room.put("name", mChatroom.mName);
                 room.getRelation("members").add(curUser.getParseUser());
-                room.saveInBackground(mChatroom.mCreatedCallback);
+                room.saveInBackground(new ChatroomSaved(mChatroom, listener));
             }
 
             Chatroom chat = mChatroom;
@@ -145,5 +155,9 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
             return chat;
         }
+    }
+
+    public interface BuiltListener {
+        void onChatroomBuilt(Chatroom room);
     }
 }
