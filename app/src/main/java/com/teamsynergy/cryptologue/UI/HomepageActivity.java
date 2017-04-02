@@ -42,6 +42,10 @@ public class HomepageActivity extends AppCompatActivity {
 
         ParseInit.start(this);
 
+/*        Chatroom.Builder builder = new Chatroom.Builder();
+        builder.setName("test");
+        builder.build(true, null)*/;
+
         Intent sIntent = new Intent(getApplicationContext(), MessagingService.class);
         startService(sIntent);
 

@@ -44,16 +44,21 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
     public void inviteUsers(List<User> inv) {
         ArrayList<ParseObject> invObjs = new ArrayList<>();
-        for (User usr : inv) {
-            if (mMembers.contains(usr)) continue;
-            else mMembers.add(usr);
+        for (int i = 0; i < inv.size(); ++i) {
+            User usr = inv.get(i);
+
+            if (mMembers != inv) {
+                if (mMembers.contains(usr)) continue;
+                else mMembers.add(usr);
+            }
 
             ParseObject obj = new ParseObject("RoomLookup");
             obj.put("user", usr.getParseUser());
             obj.put("chatroom", mParseObj);
+            obj.saveInBackground();
             invObjs.add(obj);
         }
-        ParseObject.saveAllInBackground(invObjs);
+        //ParseObject.saveAllInBackground(invObjs);
     }
 
     private static class ChatroomSaved implements SaveCallback {
@@ -141,7 +146,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
             if (isNew && mChatroom != null) {
                 UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
 
-                addMember(new User(curUser.getUsername(), curUser.getDisplayName(), curUser.getPhoneNumber(), curUser.getParseUser()));
+                addMember(curUser);
 
                 ParseObject room = new ParseObject("Chatrooms");
                 mChatroom.mParseObj = room;
