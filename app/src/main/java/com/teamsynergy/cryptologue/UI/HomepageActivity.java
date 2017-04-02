@@ -29,6 +29,7 @@ import static android.app.PendingIntent.getActivity;
 
 public class HomepageActivity extends AppCompatActivity {
     private final static int RESULT_LOGGED_IN = 1;
+    private final static int RESULT_CHATROOM_CREATED = 2;
 
     private ListView mListView;
     private ArrayList<Chatroom> mChatroomList = new ArrayList<>();
@@ -57,9 +58,6 @@ public class HomepageActivity extends AppCompatActivity {
             updateChatrooms();
         }
 
-        Intent intent = new Intent(getApplicationContext(), SelectContactsActivity.class);
-        startActivity(intent);
-
 
 /*        Chatroom.Builder cB = new Chatroom.Builder();
         cB.setName("Tetst");
@@ -82,7 +80,7 @@ public class HomepageActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.newChat:
                 Intent intentNewChat = new Intent(this, CreateChatroomActivity.class);
-                startActivity(intentNewChat);
+                startActivityForResult(intentNewChat, RESULT_CHATROOM_CREATED);
                 return true;
             case R.id.settings:
                 Intent intentSettings = new Intent(this, SettingsActivity.class);
@@ -104,6 +102,12 @@ public class HomepageActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 updateChatrooms();
+            }
+        } else if (requestCode == RESULT_CHATROOM_CREATED) {
+            if (resultCode == RESULT_OK) {
+                Intent Intent = new Intent(this, ChatroomActivity.class);
+                Intent.putExtra("chatroom", data.getParcelableExtra("chatroom"));
+                startActivity(Intent);
             }
         }
     }

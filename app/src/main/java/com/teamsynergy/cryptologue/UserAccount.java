@@ -36,7 +36,7 @@ public class UserAccount extends User implements SecurityCheck {
                             Chatroom.Builder builder = new Chatroom.Builder();
                             builder.setName(room.getString("name"));
                             builder.setParseObj(room);
-                            roomList.add(builder.build(false));
+                            roomList.add(builder.build(false, null));
                         }
 
                         if (listener != null) {

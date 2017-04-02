@@ -1,6 +1,8 @@
 package com.teamsynergy.cryptologue.UI;
 
+import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -13,9 +15,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;
+import com.teamsynergy.cryptologue.UserAccount;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +36,7 @@ public class SelectContactsActivity extends AppCompatActivity {
     private Button mInviteButton;
     private ListView mListView;
     private ArrayList<Pair<String, String>> mContactList = new ArrayList<>();
+    private UserAccount curAcc;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,28 +84,23 @@ public class SelectContactsActivity extends AppCompatActivity {
         mInviteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> numbers = new ArrayList<String>();
                 List<Pair<String, String>> selected = adapter.getCheckedContacts();
-                for (Pair<String, String> sel : selected) {
-                    numbers.add(sel.second);
+
+                String[] numbers = new String[selected.size()];
+                for (int i = 0; i < numbers.length; ++i) {
+                    numbers[i] = (selected.get(i).second);
                 }
 
-                User.findByPhoneNumber(numbers, new User.UsersFoundListener() {
-                    @Override
-                    public void onUsersFound(List<User> users) {
-                        Chatroom.Builder builder = new Chatroom.Builder();
-                        builder.setName(getIntent().getStringExtra("Chatroom name"));
-                        for (User usr : users) {
-                            builder.addMember(usr);
-                        }
-                        builder.build(true);
-                        finish();
-                    }
-                });
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("selectedNumbers", numbers);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
 
             }
         });
 
         getSupportActionBar().setTitle("Selects contacts...");
     }
+
+
 }
