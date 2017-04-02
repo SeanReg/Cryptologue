@@ -108,7 +108,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
     private Chatroom(Parcel in) {
         mName = in.readString();
-        in.readList(mMembers, null);
+        in.readList(mMembers, getClass().getClassLoader());
 
         mParseObj = new ParseObject("Chatrooms");
         mParseObj.setObjectId(in.readString());
@@ -141,7 +141,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
             if (isNew && mChatroom != null) {
                 UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
 
-                addMember(curUser);
+                addMember(new User(curUser.getUsername(), curUser.getDisplayName(), curUser.getPhoneNumber(), curUser.getParseUser()));
 
                 ParseObject room = new ParseObject("Chatrooms");
                 mChatroom.mParseObj = room;
