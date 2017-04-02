@@ -11,6 +11,7 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by jasonpinlac on 3/26/17.
@@ -83,6 +84,14 @@ public class User implements Parcelable {
         mPhoneNumber = in.readString();
         mParseUser = new ParseUser();
         mParseUser.setObjectId(in.readString());
+    }
+
+    @Override
+    public boolean equals(Object usr) {
+        if (usr instanceof User) {
+            return getUsername().equals(usr);
+        }
+        return super.equals(usr);
     }
 
     public interface UsersFoundListener {

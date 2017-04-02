@@ -45,6 +45,9 @@ public class Chatroom implements SecurityCheck, Parcelable {
     public void inviteUsers(List<User> inv) {
         ArrayList<ParseObject> invObjs = new ArrayList<>();
         for (User usr : inv) {
+            if (mMembers.contains(usr)) continue;
+            else mMembers.add(usr);
+
             ParseObject obj = new ParseObject("RoomLookup");
             obj.put("user", usr.getParseUser());
             obj.put("chatroom", mParseObj);
