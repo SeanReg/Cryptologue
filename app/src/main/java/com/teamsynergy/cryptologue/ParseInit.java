@@ -18,7 +18,7 @@ public class ParseInit {
             Parse.initialize(new Parse.Configuration.Builder(con)
                     .applicationId("I6DUDtMs1nxNl3w4MA794RSqBGmgPl7gnlJrjrtW")
                     .clientKey("fqi3Z155yA0xr2uZoN6SBkdh9zvlXVedDE6aEYUQ")
-                    .server("https://parseapi.back4app.com/").build()
+                    .server("https://cryptologue.back4app.io/").build()
             );
         }
     }

@@ -55,10 +55,10 @@ public class Chatroom implements SecurityCheck, Parcelable {
             ParseObject obj = new ParseObject("RoomLookup");
             obj.put("user", usr.getParseUser());
             obj.put("chatroom", mParseObj);
-            obj.saveInBackground();
+            //obj.saveInBackground();
             invObjs.add(obj);
         }
-        //ParseObject.saveAllInBackground(invObjs);
+        ParseObject.saveAllInBackground(invObjs);
     }
 
     private static class ChatroomSaved implements SaveCallback {
