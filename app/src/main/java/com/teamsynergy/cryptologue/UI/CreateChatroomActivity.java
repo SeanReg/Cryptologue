@@ -20,11 +20,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,8 +91,8 @@ public class CreateChatroomActivity extends AppCompatActivity {
             // When an Image is picked
             if (requestCode == RESULT_LOAD_IMG) {
                 if (resultCode == RESULT_OK && null != data) {
-                    // Get the Image from data
 
+                    // Get the Image from data
                     Uri selectedImage = data.getData();
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
@@ -101,6 +104,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
 
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                     imgDecodableString = cursor.getString(columnIndex);
+
                     cursor.close();
                     ImageView imgView = (ImageView) findViewById(R.id.chatAvatar);
                     // Set the Image in ImageView after decoding the String
@@ -119,14 +123,17 @@ public class CreateChatroomActivity extends AppCompatActivity {
                         public void onUsersFound(List<User> users) {
                             Chatroom.Builder builder = new Chatroom.Builder();
                             builder.setName(_nameText.getText().toString());
+                            builder.setImage(new File(imgDecodableString));
                             for (User usr : users) {
                                 builder.addMember(usr);
                             }
                             builder.build(true, new Chatroom.BuiltListener() {
                                 @Override
                                 public void onChatroomBuilt(Chatroom room) {
+                                    ObjectPasser.putObject(room.getId(), room);
+
                                     Intent resultIntent = new Intent();
-                                    resultIntent.putExtra("chatroom", room);
+                                    resultIntent.putExtra("chatroom", room.getId());
                                     setResult(Activity.RESULT_OK, resultIntent);
                                     finish();
                                 }

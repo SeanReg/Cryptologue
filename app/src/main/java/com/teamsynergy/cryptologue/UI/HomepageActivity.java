@@ -106,7 +106,7 @@ public class HomepageActivity extends AppCompatActivity {
         } else if (requestCode == RESULT_CHATROOM_CREATED) {
             if (resultCode == RESULT_OK) {
                 Intent Intent = new Intent(this, ChatroomActivity.class);
-                Intent.putExtra("chatroom", data.getParcelableExtra("chatroom"));
+                Intent.putExtra("chatroom", data.getStringExtra("chatroom"));
                 startActivity(Intent);
             }
         }
