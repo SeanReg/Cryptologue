@@ -97,8 +97,6 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        addToActionBar();
-
         mChatroom.setMessageListener(new MessagingService.MessageListener() {
             @Override
             public void onMessageRecieved(Message msg) {
@@ -108,9 +106,14 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_overflow, menu);
+        inflater.inflate(R.menu.menu_chatroom_icon, menu);
+
+
+        addToActionBar(menu);
+
         return true;
     }
 
@@ -147,7 +150,7 @@ public class ChatroomActivity extends AppCompatActivity {
         chatArrayAdapter.add(new ChatMessageBubble(isSender, msg));
     }
 
-    private void addToActionBar() {
+    private void addToActionBar(final Menu menu) {
         mChatroomImage = mChatroom.getImage();
         mChatroomImage.getDataInBackground(new GetDataCallback() {
             public void done(byte[] data, ParseException e) {
@@ -156,26 +159,17 @@ public class ChatroomActivity extends AppCompatActivity {
                 if (e == null) {
                     bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
                     d = new BitmapDrawable(getResources(), bmp);
+                    menu.findItem(R.id.action_icon).setIcon(d);
                 } else {
                     Log.d("test",
                             "Problem load image the data.");
                 }
 
-                getSupportActionBar().setDisplayShowHomeEnabled(false);
-                getSupportActionBar().setDisplayShowCustomEnabled(true);
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
-                getSupportActionBar().setDisplayOptions(DISPLAY_SHOW_CUSTOM);
-                getSupportActionBar().setCustomView(R.layout.action_bar);
 
-                ImageView chatAvatar = (ImageView) findViewById(R.id.avatar);
-                TextView chatName = (TextView) findViewById(R.id.name);
-                chatAvatar.setMaxHeight(getSupportActionBar().getHeight());
-                chatAvatar.setImageBitmap(bmp);
-                chatName.setText(mChatroom.getName());
-                chatName.setMaxHeight(getSupportActionBar().getHeight());
-//                getSupportActionBar().setTitle(mChatroom.getName());
-//                getSupportActionBar().setLogo(d);
             }
         });
+
+        getSupportActionBar().setTitle(mChatroom.getName());
+
     }
 }
