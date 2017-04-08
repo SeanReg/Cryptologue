@@ -36,7 +36,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMG = 1;
     private static int RESULT_SELECT_CONTACTS = 2;
-    String imgDecodableString;
+    String imgDecodableString = null;
 
     EditText _nameText;
     Button _uploadChatAvatar;
@@ -123,7 +123,8 @@ public class CreateChatroomActivity extends AppCompatActivity {
                         public void onUsersFound(List<User> users) {
                             Chatroom.Builder builder = new Chatroom.Builder();
                             builder.setName(_nameText.getText().toString());
-                            builder.setImage(new File(imgDecodableString));
+                            if (imgDecodableString != null)
+                                builder.setImage(new File(imgDecodableString));
                             for (User usr : users) {
                                 builder.addMember(usr);
                             }
