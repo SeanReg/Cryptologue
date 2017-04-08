@@ -97,12 +97,8 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        mChatroom.setMessageListener(new MessagingService.MessageListener() {
-            @Override
-            public void onMessageRecieved(Message msg) {
-                addChatMessage(msg.getText(), false);
-            }
-        });
+        mChatroom.getCachedMessages(mMessageRecieved);
+        mChatroom.setMessageListener(mMessageRecieved);
     }
 
     @Override
@@ -174,4 +170,12 @@ public class ChatroomActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(mChatroom.getName());
 
     }
+
+    private final MessagingService.MessageListener mMessageRecieved = new MessagingService.MessageListener() {
+        @Override
+        public void onMessageRecieved(Message msg) {
+            addChatMessage(msg.getText(), false);
+        }
+    };
+
 }
