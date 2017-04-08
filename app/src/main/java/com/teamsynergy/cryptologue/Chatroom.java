@@ -3,9 +3,11 @@ package com.teamsynergy.cryptologue;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -31,11 +33,43 @@ public class Chatroom implements SecurityCheck, Parcelable {
     }
 
     public void sendMessage(Message msg) {
+        cacheMessage(msg);
         MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
     }
 
-    public void setMessageListener(MessagingService.MessageListener listener) {
-        MessagingService.getInstance().setMessagingListener(listener);
+    public void setMessageListener(final MessagingService.MessageListener listener) {
+        MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
+            @Override
+            public void onMessageRecieved(Message s) {
+                cacheMessage(s);
+
+                listener.onMessageRecieved(s);
+            }
+        });
+    }
+
+    private void cacheMessage(Message msg) {
+        ParseObject msgObject = new ParseObject("Messages");
+        msgObject.put("userId", "");
+        msgObject.put("chatroomId", mParseObj.getObjectId());
+        msgObject.put("text", msg.getText());
+        msgObject.pinInBackground();
+    }
+
+    public void getCachedMessages(final MessagingService.MessageListener listener) {
+        ParseQuery query = new ParseQuery("Messages");
+        query.orderByAscending("createdAt");
+        query.whereEqualTo("chatroomId", mParseObj.getObjectId());
+        query.fromLocalDatastore();
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                for (ParseObject obj : objects) {
+                    Message msg = new Message(obj.getString("text"));
+                    listener.onMessageRecieved(msg);
+                }
+            }
+        });
     }
 
     public void inviteUser(User inv) {
@@ -115,8 +149,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
         mName = in.readString();
         in.readList(mMembers, getClass().getClassLoader());
 
-        mParseObj = new ParseObject("Chatrooms");
-        mParseObj.setObjectId(in.readString());
+        mParseObj = ParseObject.createWithoutData("Chatrooms", in.readString());
     }
 
     public static class Builder {
