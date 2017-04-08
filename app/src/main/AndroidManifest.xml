@@ -85,7 +85,8 @@
         <activity
             android:name=".UI.ChatroomActivity"
             android:label="@string/title_activity_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:icon="@drawable/arrow_bg1"></activity>
 
         <activity android:name=".UI.SelectContactsActivity"
             android:theme="@style/AppTheme.Dark.ActionBar"></activity>

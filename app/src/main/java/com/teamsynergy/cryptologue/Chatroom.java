@@ -2,13 +2,14 @@ package com.teamsynergy.cryptologue;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
-import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,9 +18,10 @@ import java.util.List;
  * Created by Sean on 3/29/2017.
  */
 
-public class Chatroom implements SecurityCheck, Parcelable {
+public class Chatroom implements SecurityCheck { //, Parcelable {
     private String mName = "";
     private ParseObject mParseObj = null;
+    private ParseFile mImage = null;
     private ArrayList<User> mMembers = new ArrayList<>();
 
     private Chatroom() {
@@ -28,6 +30,10 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
     public String getName() {
         return mName;
+    }
+
+    public ParseFile getImage() {
+        return mParseObj.getParseFile("icon");
     }
 
     public void sendMessage(Message msg) {
@@ -84,12 +90,16 @@ public class Chatroom implements SecurityCheck, Parcelable {
     }
 
 
+    public String getId() {
+        return mParseObj.getObjectId();
+    }
+
     @Override
     public void invalidate() {
 
     }
 
-    @Override
+/*    @Override
     public int describeContents() {
         return 0;
     }
@@ -117,23 +127,29 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
         mParseObj = new ParseObject("Chatrooms");
         mParseObj.setObjectId(in.readString());
-    }
+    }*/
 
     public static class Builder {
         private Chatroom mChatroom = new Chatroom();
+        private boolean mIsBuilt = false;
 
         public void setName(String name) {
-            if (mChatroom != null)
+            if (!mIsBuilt)
                 mChatroom.mName = name;
         }
 
         public void setParseObj(ParseObject parseObj) {
-            if (mChatroom != null)
+            if (!mIsBuilt)
                 mChatroom.mParseObj = parseObj;
         }
 
+        public void setImage(File image) {
+            if (!mIsBuilt)
+                mChatroom.mImage = new ParseFile(image);
+        }
+
         public void addMember(User member) {
-            if (mChatroom != null) {
+            if (!mIsBuilt) {
                 for (User usr : mChatroom.mMembers) {
                     if (usr.getUsername().equals(member.getUsername()))
                         return;
@@ -142,23 +158,39 @@ public class Chatroom implements SecurityCheck, Parcelable {
             }
         }
 
-        public Chatroom build(boolean isNew, BuiltListener listener) {
-            if (isNew && mChatroom != null) {
-                UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
+        public Chatroom build(boolean isNew, final BuiltListener listener) {
+            if (isNew && !mIsBuilt) {
+                mIsBuilt = true;
+                final UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
 
                 addMember(curUser);
 
-                ParseObject room = new ParseObject("Chatrooms");
-                mChatroom.mParseObj = room;
-                room.put("name", mChatroom.mName);
-                room.getRelation("members").add(curUser.getParseUser());
+                // save and get callback
+                final ParseFile f = mChatroom.mImage;
+                final ParseObject room = new ParseObject("Chatrooms");
+
+                if(mChatroom.mImage == null) {
+                        saveChatroom(curUser, room, f);
+                } else {
+                    f.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            saveChatroom(curUser, room, f);
+                        }
+                    });
+                }
                 room.saveInBackground(new ChatroomSaved(mChatroom, listener));
             }
 
-            Chatroom chat = mChatroom;
-            mChatroom = null;
+            return mChatroom;
+        }
 
-            return chat;
+        public void saveChatroom(UserAccount currentUser, ParseObject room, ParseFile f) {
+            mChatroom.mParseObj = room;
+            room.put("name", mChatroom.mName);
+            if(f != null) { room.put("icon", f); }
+            room.getRelation("members").add(currentUser.getParseUser());
+            Log.i("Order", "Image Uploaded");
         }
     }
 

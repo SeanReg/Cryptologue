@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.widget.TextView;
 
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 
 import java.util.ArrayList;
@@ -59,8 +60,10 @@ public class ChatroomListAdapter extends BaseAdapter {
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ObjectPasser.putObject(room.getId(), room);
+
                 Intent Intent = new Intent(mContext, ChatroomActivity.class);
-                Intent.putExtra("chatroom", room);
+                Intent.putExtra("chatroom", room.getId());
                 mContext.startActivity(Intent);
             }
         });

@@ -1,10 +1,17 @@
 package com.teamsynergy.cryptologue.UI;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,15 +20,23 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.ChatMessageBubble;
 import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.Message;
 import com.teamsynergy.cryptologue.MessagingService;
+import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
+
+import static android.app.ActionBar.DISPLAY_SHOW_CUSTOM;
 
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -34,6 +49,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
 
     private Chatroom mChatroom = null;
+    private ParseFile mChatroomImage = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,8 +61,9 @@ public class ChatroomActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.msgview);
 
+
         Intent roomIntent = getIntent();
-        mChatroom = (Chatroom)roomIntent.getParcelableExtra("chatroom");
+        mChatroom = (Chatroom)ObjectPasser.popObject(roomIntent.getStringExtra("chatroom"));
 
         chatArrayAdapter = new ChatArrayAdapter(getApplicationContext(), R.layout.right);
         listView.setAdapter(chatArrayAdapter);
@@ -80,8 +97,6 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        getSupportActionBar().setTitle(mChatroom.getName());
-
         mChatroom.setMessageListener(new MessagingService.MessageListener() {
             @Override
             public void onMessageRecieved(Message msg) {
@@ -91,9 +106,14 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_overflow, menu);
+        inflater.inflate(R.menu.menu_chatroom_icon, menu);
+
+
+        addToActionBar(menu);
+
         return true;
     }
 
@@ -128,5 +148,30 @@ public class ChatroomActivity extends AppCompatActivity {
 
     private void addChatMessage(String msg, boolean isSender) {
         chatArrayAdapter.add(new ChatMessageBubble(isSender, msg));
+    }
+
+    private void addToActionBar(final Menu menu) {
+        mChatroomImage = mChatroom.getImage();
+        if (mChatroomImage != null) {
+            mChatroomImage.getDataInBackground(new GetDataCallback() {
+                public void done(byte[] data, ParseException e) {
+                    Bitmap bmp = null;
+                    Drawable d = null;
+                    if (e == null) {
+                        bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        d = new BitmapDrawable(getResources(), bmp);
+                        menu.findItem(R.id.action_icon).setIcon(d);
+                    } else {
+                        Log.d("test",
+                                "Problem load image the data.");
+                    }
+
+
+                }
+            });
+        }
+
+        getSupportActionBar().setTitle(mChatroom.getName());
+
     }
 }
