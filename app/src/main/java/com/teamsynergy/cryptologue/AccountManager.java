@@ -3,6 +3,7 @@ package com.teamsynergy.cryptologue;
 import android.content.Intent;
 
 import com.parse.LogInCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -154,6 +155,10 @@ public class AccountManager {
     private void constructCurrentAccount() {
         ParseUser pUser = ParseUser.getCurrentUser();
         mCurAccount = new UserAccount(pUser.getUsername(), (String)pUser.get("displayName"), (String)pUser.get("phone"), pUser);
+
+        ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
+        parseACL.setPublicReadAccess(true);
+        pUser.setACL(parseACL);
     }
 
     public <T extends SecurityCheck> T createSecurityObject(Class<T> create) {
