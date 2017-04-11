@@ -22,6 +22,7 @@ import com.teamsynergy.cryptologue.Message;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
+import com.teamsynergy.cryptologue.UserAccount;
 
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -129,7 +130,10 @@ public class ChatroomActivity extends AppCompatActivity {
     private final MessagingService.MessageListener mMessageRecieved = new MessagingService.MessageListener() {
         @Override
         public void onMessageRecieved(Message msg) {
-            addChatMessage(msg.getText(), false);
+            UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
+            String curUsrId = curAcc.getParseUser().getObjectId();
+            
+            addChatMessage(msg.getText(), curUsrId.equals(msg.getSender()));
         }
     };
 }

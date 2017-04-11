@@ -33,6 +33,9 @@ public class Chatroom implements SecurityCheck, Parcelable {
     }
 
     public void sendMessage(Message msg) {
+        msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
+
+        
         cacheMessage(msg);
         MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
     }
@@ -50,7 +53,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
 
     private void cacheMessage(Message msg) {
         ParseObject msgObject = new ParseObject("Messages");
-        msgObject.put("userId", "");
+        msgObject.put("userId", msg.getSender());
         msgObject.put("chatroomId", mParseObj.getObjectId());
         msgObject.put("text", msg.getText());
         msgObject.pinInBackground();
@@ -66,6 +69,7 @@ public class Chatroom implements SecurityCheck, Parcelable {
             public void done(List<ParseObject> objects, ParseException e) {
                 for (ParseObject obj : objects) {
                     Message msg = new Message(obj.getString("text"));
+                    msg.setSender(obj.getString("userId"));
                     listener.onMessageRecieved(msg);
                 }
             }

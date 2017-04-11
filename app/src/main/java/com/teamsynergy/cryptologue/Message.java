@@ -8,6 +8,7 @@ import java.io.File;
 
 public class Message {
     private String mMsgText = "";
+    private String mSender = "";
 
     public Message() {
 
@@ -23,6 +24,14 @@ public class Message {
 
     public void setAttachment(File file) {
 
+    }
+
+    public void setSender(String senderId) {
+        mSender = senderId;
+    }
+
+    public String getSender() {
+        return mSender;
     }
 
     public String getText() {
