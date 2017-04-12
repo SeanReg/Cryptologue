@@ -87,6 +87,31 @@
             android:label="@string/title_activity_chatroom"
             android:theme="@style/AppTheme.Dark.ActionBar"
             android:icon="@drawable/arrow_bg1"></activity>
+        <activity
+            android:name=".UI.ChatRoomNameActivity"
+            android:label="ChatroomNameActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:icon="@drawable/arrow_bg1"></activity>
+        <activity
+            android:name=".UI.EventsActivity"
+            android:label="EventsActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:icon="@drawable/arrow_bg1"></activity>
+        <activity
+            android:name=".UI.PollsActivity"
+            android:label="PollsActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:icon="@drawable/arrow_bg1"></activity>
+        <activity
+            android:name=".UI.MembersActivity"
+            android:label="MembersActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:icon="@drawable/arrow_bg1"></activity>
+        <activity
+            android:name=".UI.LeaveChatActivity"
+            android:label="LeaveChatActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:icon="@drawable/arrow_bg1"></activity>
 
         <activity android:name=".UI.SelectContactsActivity"
             android:theme="@style/AppTheme.Dark.ActionBar"></activity>

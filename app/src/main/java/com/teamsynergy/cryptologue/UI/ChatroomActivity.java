@@ -1,6 +1,8 @@
 package com.teamsynergy.cryptologue.UI;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
@@ -9,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -36,6 +39,9 @@ import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
 import com.teamsynergy.cryptologue.UserAccount;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.inputmethod.InputMethodManager;
+
 
 import static android.app.ActionBar.DISPLAY_SHOW_CUSTOM;
 
@@ -49,8 +55,18 @@ public class ChatroomActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private boolean side = false;
 
+    private Button buttonChatRoomName;
+    private Button buttonEvents;
+    private Button buttonPolls;
+    private Button buttonMembers;
+    private Button buttonLeaveChat;
+
+
     private Chatroom mChatroom = null;
     private ParseFile mChatroomImage = null;
+
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +76,19 @@ public class ChatroomActivity extends AppCompatActivity {
 
         buttonSend = (Button) findViewById(R.id.send);
 
+        buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
+        buttonEvents = (Button) findViewById(R.id.events_button);
+        buttonPolls = (Button) findViewById(R.id.polls_button);
+        buttonMembers = (Button) findViewById(R.id.members_button);
+        buttonLeaveChat = (Button) findViewById(R.id.leave_chat_button);
+
+
         listView = (ListView) findViewById(R.id.msgview);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        setupDrawerListener();
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
 
 
         Intent roomIntent = getIntent();
@@ -83,6 +111,41 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 sendChatMessage();
+            }
+        });
+
+        buttonChatRoomName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ChatRoomNameActivity.class));
+            }
+        });
+
+        buttonEvents.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), EventsActivity.class));
+            }
+        });
+
+        buttonPolls.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), PollsActivity.class));
+            }
+        });
+
+        buttonMembers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), MembersActivity.class));
+            }
+        });
+
+        buttonLeaveChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), LeaveChatActivity.class));
             }
         });
 
@@ -176,5 +239,28 @@ public class ChatroomActivity extends AppCompatActivity {
             addChatMessage(msg.getText(), curUsrId.equals(msg.getSender()));
         }
     };
+
+    private void setupDrawerListener() {
+        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.app_name, R.string.app_name) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
+                super.onDrawerClosed(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
+                super.onDrawerOpened(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        };
+    }
 
 }
