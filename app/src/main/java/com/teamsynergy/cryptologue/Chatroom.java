@@ -212,18 +212,18 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 // save and get callback
                 final ParseFile f = mChatroom.mImage;
                 final ParseObject room = new ParseObject("Chatrooms");
-                mChatroom.mParseObj = room;
+
                 if(mChatroom.mImage == null) {
-                        saveChatroom(curUser, room, f);
+                        saveChatroom(curUser, room, f, listener);
                 } else {
                     f.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            saveChatroom(curUser, room, f);
+                            saveChatroom(curUser, room, f, listener);
                         }
                     });
                 }
-                room.saveInBackground(new ChatroomSaved(mChatroom, listener));
+
 
                 mIsBuilt = true;
             }
@@ -231,7 +231,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             return mChatroom;
         }
 
-        public void saveChatroom(UserAccount currentUser, ParseObject room, ParseFile f) {
+        public void saveChatroom(UserAccount currentUser, ParseObject room, ParseFile f, final BuiltListener listener) {
+            room.saveInBackground(new ChatroomSaved(mChatroom, listener));
+
+            mChatroom.mParseObj = room;
             room.put("name", mChatroom.mName);
             if(f != null) { room.put("icon", f); }
             room.getRelation("members").add(currentUser.getParseUser());

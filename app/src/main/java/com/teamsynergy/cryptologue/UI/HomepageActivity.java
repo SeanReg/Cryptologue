@@ -122,7 +122,7 @@ public class HomepageActivity extends AppCompatActivity {
             @Override
             public void onGotChatrooms(List<Chatroom> rooms) {
                 for (Chatroom room : rooms) {
-                    Log.d("Room", room.getName());
+                    //Log.d("Room", room.getName());
                     mChatroomList.add(room);
                 }
                 mListView.setAdapter(mChatroomAdapter);
