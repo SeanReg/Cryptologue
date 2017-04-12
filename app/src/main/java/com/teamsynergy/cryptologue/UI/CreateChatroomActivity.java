@@ -2,8 +2,11 @@ package com.teamsynergy.cryptologue.UI;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +31,7 @@ import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,9 +111,32 @@ public class CreateChatroomActivity extends AppCompatActivity {
 
                     cursor.close();
                     ImageView imgView = (ImageView) findViewById(R.id.chatAvatar);
-                    // Set the Image in ImageView after decoding the String
-                    imgView.setImageBitmap(BitmapFactory
-                            .decodeFile(imgDecodableString));
+                    // Set the Image in ImageView after decoding the
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inMutable=true;
+                    Bitmap imgBitmap = BitmapFactory
+                            .decodeFile(imgDecodableString, options);
+
+                    int bW, bH;
+                    if (imgBitmap.getWidth() > imgBitmap.getHeight()) {
+                        bH = ((int)(imgBitmap.getHeight() / (float)imgBitmap.getWidth()
+                                * 128.0f));
+                        bW = (128);
+                    } else {
+                        bW = ((int)(imgBitmap.getWidth() / (float)imgBitmap.getHeight()
+                                * 128.0f));
+                        bH = (128);
+                    }
+
+                    ContextWrapper cw = new ContextWrapper(getApplicationContext());
+                    // path to /data/data/yourapp/app_data/imageDir
+                    File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+
+                    Bitmap scaledBmp = Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
+                    imgView.setImageBitmap(scaledBmp);
+                    scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
+                            new FileOutputStream(new File(directory, "temp1.jpg")));
+                    imgBitmap.recycle();
 
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
@@ -145,6 +172,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
                     .show();
         }

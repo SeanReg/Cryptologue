@@ -1,8 +1,11 @@
 package com.teamsynergy.cryptologue.UI;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.UserAccount;
 
 import java.io.File;
+import java.io.FileOutputStream;
 
 
 public class SettingsActivity extends AppCompatActivity {
@@ -202,11 +206,33 @@ public class SettingsActivity extends AppCompatActivity {
 
                     cursor.close();
                     ImageView imgView = (ImageView) findViewById(R.id.userAvatar);
-                    // Set the Image in ImageView after decoding the String
-                    imgView.setImageBitmap(BitmapFactory
-                            .decodeFile(imgDecodableString));
+                    // Set the Image in ImageView after decoding the
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inMutable=true;
+                    Bitmap imgBitmap = BitmapFactory
+                            .decodeFile(imgDecodableString, options);
 
-                    _userAvatar = new File(imgDecodableString);
+                    int bW, bH;
+                    if (imgBitmap.getWidth() > imgBitmap.getHeight()) {
+                        bH = ((int)(imgBitmap.getHeight() / (float)imgBitmap.getWidth()
+                                * 128.0f));
+                        bW = (128);
+                    } else {
+                        bW = ((int)(imgBitmap.getWidth() / (float)imgBitmap.getHeight()
+                                * 128.0f));
+                        bH = (128);
+                    }
+
+                    ContextWrapper cw = new ContextWrapper(getApplicationContext());
+                    // path to /data/data/yourapp/app_data/imageDir
+                    File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+                    _userAvatar = new File(directory, "temp.jpg");
+
+                    Bitmap scaledBmp = Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
+                    imgView.setImageBitmap(scaledBmp);
+                    scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
+                            new FileOutputStream(_userAvatar));
+                    imgBitmap.recycle();
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
                             Toast.LENGTH_LONG).show();
@@ -215,6 +241,9 @@ public class SettingsActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
                     .show();
+
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

@@ -148,25 +148,20 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     private void addToActionBar(final Menu menu) {
-        mChatroomImage = mChatroom.getImage();
-        if (mChatroomImage != null) {
-            mChatroomImage.getDataInBackground(new GetDataCallback() {
-                public void done(byte[] data, ParseException e) {
-                    Bitmap bmp = null;
-                    Drawable d = null;
-                    if (e == null) {
-                        bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-                        d = new BitmapDrawable(getResources(), bmp);
-                        menu.findItem(R.id.action_icon).setIcon(d);
-                    } else {
-                        Log.d("test",
-                                "Problem load image the data.");
-                    }
-
-
+        mChatroom.getImage(new GetDataCallback() {
+            public void done(byte[] data, ParseException e) {
+                Bitmap bmp = null;
+                Drawable d = null;
+                if (e == null) {
+                    bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+                    d = new BitmapDrawable(getResources(), bmp);
+                    menu.findItem(R.id.action_icon).setIcon(d);
+                } else {
+                    Log.d("test",
+                            "Problem load image the data.");
                 }
-            });
-        }
+            }
+        });
 
         getSupportActionBar().setTitle(mChatroom.getName());
 

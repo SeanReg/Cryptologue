@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -36,8 +37,11 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         return mName;
     }
 
-    public ParseFile getImage() {
-        return mParseObj.getParseFile("icon");
+    public void getImage(GetDataCallback listener) {
+        if (mParseObj.getParseFile("icon") == null)
+            return;
+
+        mParseObj.getParseFile("icon").getDataInBackground(listener);
     }
 
     public void sendMessage(Message msg) {
@@ -123,6 +127,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 e.printStackTrace();
             } else {
                 mChatroom.inviteUsers(mChatroom.mMembers);
+
                 if (mBuiltListener != null)
                     mBuiltListener.onChatroomBuilt(mChatroom);
             }
@@ -207,7 +212,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 // save and get callback
                 final ParseFile f = mChatroom.mImage;
                 final ParseObject room = new ParseObject("Chatrooms");
-
+                mChatroom.mParseObj = room;
                 if(mChatroom.mImage == null) {
                         saveChatroom(curUser, room, f);
                 } else {
@@ -225,7 +230,6 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         }
 
         public void saveChatroom(UserAccount currentUser, ParseObject room, ParseFile f) {
-            mChatroom.mParseObj = room;
             room.put("name", mChatroom.mName);
             if(f != null) { room.put("icon", f); }
             room.getRelation("members").add(currentUser.getParseUser());

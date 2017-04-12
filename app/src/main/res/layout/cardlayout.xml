@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="@color/white"
-        android:foreground="?android:attr/selectableItemBackground">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="@color/white"
+    android:foreground="?android:attr/selectableItemBackground">
 
-        <com.teamsynergy.cryptologue.UI.TextLatoView
-            android:id="@+id/roomName"
-            android:textColor="@android:color/darker_gray"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding = "8dp"
-            android:ellipsize="marquee"
-            android:singleLine="true"
-            android:text="ChatRoomName"
-            android:textSize="20sp" />
+    <ImageView
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:gravity="end"
+        android:layout_alignParentEnd="true"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:id="@+id/chatAvatar"
+        android:src="@drawable/user_placeholder">
+    </ImageView>
 
-    </LinearLayout>
+    <com.teamsynergy.cryptologue.UI.TextLatoView
+        android:id="@+id/roomName"
+        android:textColor="@android:color/darker_gray"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding = "8dp"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text="ChatRoomName"
+        android:textSize="20sp" />
+
+</RelativeLayout>
 
 
