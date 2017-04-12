@@ -200,7 +200,6 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
         public Chatroom build(boolean isNew, final BuiltListener listener) {
             if (isNew && !mIsBuilt) {
-                mIsBuilt = true;
                 final UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
 
                 addMember(curUser);
@@ -220,6 +219,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                     });
                 }
                 room.saveInBackground(new ChatroomSaved(mChatroom, listener));
+
+                mIsBuilt = true;
             }
 
             return mChatroom;
