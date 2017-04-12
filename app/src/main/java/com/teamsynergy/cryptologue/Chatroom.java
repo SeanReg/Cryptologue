@@ -28,6 +28,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     private ParseFile mImage = null;
     private ArrayList<User> mMembers = new ArrayList<>();
 
+
     private Chatroom() {
 
     }
