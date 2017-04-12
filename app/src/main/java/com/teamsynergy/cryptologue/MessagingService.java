@@ -146,8 +146,17 @@ public class MessagingService extends Service {
 
         @Override
         public void onTextMessage(String s) {
-            if (mMessageListener != null)
-                mMessageListener.onMessageRecieved(new Message(s));
+            if (mMessageListener != null) {
+                try {
+                    JSONObject j = new JSONObject(s);
+
+                    Message msg = new Message(j.getString("msg"));
+                    msg.setSender(j.getString("senderId"));
+                    mMessageListener.onMessageRecieved(msg);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
             Log.d("Socket", "Got message " + s);
         }
