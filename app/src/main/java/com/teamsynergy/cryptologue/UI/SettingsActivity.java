@@ -1,31 +1,49 @@
 package com.teamsynergy.cryptologue.UI;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import com.parse.ParseException;
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.UserAccount;
+
+import java.io.File;
 
 
 public class SettingsActivity extends AppCompatActivity {
+
+    private static int RESULT_LOAD_IMG = 1;
+    String imgDecodableString = null;
+    File _userAvatar = null;
 
     EditText _nameText;
     EditText _usernameText;
     EditText _passwordText;
     Button _saveButton;
+    ImageView _uploadUserAvatar;
 
     AccountManager manager = AccountManager.getInstance();
+
+    ProgressDialog progressDialog = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        progressDialog = new ProgressDialog(SettingsActivity.this, R.style.AppTheme_Dark_Dialog);
 
         _nameText = ((EditText)findViewById(R.id.input_name));
         _usernameText = ((EditText)findViewById(R.id.input_username));
@@ -45,6 +63,25 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        _uploadUserAvatar = ((ImageView)findViewById(R.id.userAvatar));
+
+        _uploadUserAvatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                upload();
+            }
+        });
+
+
+        AccountManager.getInstance().getCurrentAccount().getImage(new UserAccount.Callbacks() {
+            @Override
+            public void onGotProfilePicture(File image) {
+                ImageView imgView = (ImageView) findViewById(R.id.userAvatar);
+                if (image != null)
+                    // Set the Image in ImageView after decoding the String
+                    imgView.setImageBitmap(BitmapFactory.decodeFile(image.getAbsolutePath()));
+            }
+        });
     }
 
     public void save() {
@@ -55,7 +92,6 @@ public class SettingsActivity extends AppCompatActivity {
 
         _saveButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SettingsActivity.this, R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Saving Settings...");
         progressDialog.show();
@@ -65,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
         String phone = "9542549695";
 
-        manager.updateAccount(username, name, password, phone, new AccountManager.onAccountStatus() {
+        manager.updateAccount(username, name, password, phone, _userAvatar, new AccountManager.onAccountStatus() {
             @Override
             public void onSave() {
                 onSaveSuccess();
@@ -81,6 +117,7 @@ public class SettingsActivity extends AppCompatActivity {
         Toast.makeText(getBaseContext(), "Settings saved.", Toast.LENGTH_LONG).show();
         _saveButton.setEnabled(true);
         setResult(RESULT_OK, null);
+        progressDialog.dismiss();
         finish();
     }
 
@@ -133,6 +170,53 @@ public class SettingsActivity extends AppCompatActivity {
             return false;
         }
     };
+
+    public void upload() {
+        // Create intent to Open Image applications like Gallery, Google Photos
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            // When an Image is picked
+            if (requestCode == RESULT_LOAD_IMG) {
+                if (resultCode == RESULT_OK && null != data) {
+
+                    // Get the Image from data
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+                    // Get the cursor
+                    Cursor cursor = getContentResolver().query(selectedImage,
+                            filePathColumn, null, null, null);
+                    // Move to first row
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    imgDecodableString = cursor.getString(columnIndex);
+
+                    cursor.close();
+                    ImageView imgView = (ImageView) findViewById(R.id.userAvatar);
+                    // Set the Image in ImageView after decoding the String
+                    imgView.setImageBitmap(BitmapFactory
+                            .decodeFile(imgDecodableString));
+
+                    _userAvatar = new File(imgDecodableString);
+                } else {
+                    Toast.makeText(this, "You haven't picked an image",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
 }
 
 

@@ -5,11 +5,13 @@ import android.content.Intent;
 import com.parse.LogInCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 import com.teamsynergy.cryptologue.UI.LoginActivity;
 
+import java.io.File;
 import java.lang.reflect.Array;
 import java.security.Security;
 import java.util.ArrayList;
@@ -39,6 +41,10 @@ public class AccountManager {
      * The constant FIELD_DISPLAY_NAME.
      */
     public static final String FIELD_DISPLAY_NAME   = "displayName";
+    /**
+     * The constant FIELD_AVATAR.
+     */
+    public static final String FIELD_AVATAR   = "avatar";
 
     private UserAccount mCurAccount = null;
 
@@ -126,7 +132,7 @@ public class AccountManager {
         }
     }
 
-    public void updateAccount(String username, String displayName, String password, String phone, final onAccountStatus callback) {
+    public void updateAccount(String username, String displayName, String password, String phone, File avatar, final onAccountStatus callback) {
         ParseUser user = ParseUser.getCurrentUser();
         //user.setEmail(username);
         //Lower case the username so that usernames for login are not case sensistive
@@ -136,7 +142,7 @@ public class AccountManager {
         user.put(FIELD_PHONE_NUMBER, phone);
         //Save a correctly cased version of the username for display purposes
         user.put(FIELD_USERNAME_CASE, username);
-
+        if(avatar != null) { user.put(FIELD_AVATAR, new ParseFile(avatar)); }
         user.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {

@@ -1,11 +1,15 @@
 package com.teamsynergy.cryptologue;
 
 import com.parse.FindCallback;
+import com.parse.GetFileCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,8 +57,23 @@ public class UserAccount extends User implements SecurityCheck {
         mIsValid = false;
     }
 
+    public void getImage(final UserAccount.Callbacks listener) {
+        getParseUser().getParseFile(AccountManager.FIELD_AVATAR)
+                .getFileInBackground(new GetFileCallback() {
+                    @Override
+                    public void done(File file, ParseException e) {
+                        if (e != null) return;
+                        listener.onGotProfilePicture(file);
+                    }
+                });
+    }
+
     public static abstract class Callbacks {
         public void onGotChatrooms(List<Chatroom> rooms) {
+
+        }
+
+        public void onGotProfilePicture(File image) {
 
         }
     }
