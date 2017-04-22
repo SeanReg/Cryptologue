@@ -41,7 +41,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMG = 1;
     private static int RESULT_SELECT_CONTACTS = 2;
-    String imgDecodableString = null;
+    File imgDecodableFile = null;
 
     EditText _nameText;
     Button _uploadChatAvatar;
@@ -108,7 +108,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
                     cursor.moveToFirst();
 
                     int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imgDecodableString = cursor.getString(columnIndex);
+                    String imgFile = cursor.getString(columnIndex);
 
                     cursor.close();
                     ImageView imgView = (ImageView) findViewById(R.id.chatAvatar);
@@ -116,7 +116,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
                     BitmapFactory.Options options = new BitmapFactory.Options();
                     options.inMutable=true;
                     Bitmap imgBitmap = BitmapFactory
-                            .decodeFile(imgDecodableString, options);
+                            .decodeFile(imgFile, options);
 
                     ContextWrapper cw = new ContextWrapper(getApplicationContext());
                     // path to /data/data/yourapp/app_data/imageDir
@@ -124,8 +124,9 @@ public class CreateChatroomActivity extends AppCompatActivity {
 
                     Bitmap scaledBmp = ImageUtil.uniformScale(imgBitmap, 128, true);//Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
                     imgView.setImageBitmap(scaledBmp);
+                    imgDecodableFile = new File(directory, "temp1.jpg");
                     scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
-                            new FileOutputStream(new File(directory, "temp1.jpg")));
+                            new FileOutputStream(imgDecodableFile));
 
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
@@ -139,8 +140,8 @@ public class CreateChatroomActivity extends AppCompatActivity {
                         public void onUsersFound(List<User> users) {
                             Chatroom.Builder builder = new Chatroom.Builder();
                             builder.setName(_nameText.getText().toString());
-                            if (imgDecodableString != null)
-                                builder.setImage(new File(imgDecodableString));
+                            if (imgDecodableFile != null)
+                                builder.setImage(imgDecodableFile);
                             for (User usr : users) {
                                 builder.addMember(usr);
                             }
