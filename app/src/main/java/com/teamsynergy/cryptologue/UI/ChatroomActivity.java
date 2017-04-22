@@ -1,7 +1,7 @@
 package com.teamsynergy.cryptologue.UI;
 
-import android.app.ActionBar;
-import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
@@ -9,8 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,9 +24,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -41,9 +40,6 @@ import com.teamsynergy.cryptologue.ChatArrayAdapter;
 import com.teamsynergy.cryptologue.UserAccount;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.inputmethod.InputMethodManager;
-
-
-import static android.app.ActionBar.DISPLAY_SHOW_CUSTOM;
 
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -235,7 +231,7 @@ public class ChatroomActivity extends AppCompatActivity {
         public void onMessageRecieved(Message msg) {
             UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
             String curUsrId = curAcc.getParseUser().getObjectId();
-            
+
             addChatMessage(msg.getText(), curUsrId.equals(msg.getSender()));
         }
     };
