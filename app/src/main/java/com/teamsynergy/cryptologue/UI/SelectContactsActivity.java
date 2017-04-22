@@ -3,9 +3,12 @@ package com.teamsynergy.cryptologue.UI;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
@@ -17,6 +20,7 @@ import android.widget.ListView;
 
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.Manifest;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;
 import com.teamsynergy.cryptologue.UserAccount;
@@ -33,6 +37,8 @@ import java.util.List;
  */
 
 public class SelectContactsActivity extends AppCompatActivity {
+    private static final int CONTACTS_REQUEST = 1;
+
     private Button mInviteButton;
     private ListView mListView;
     private ArrayList<Pair<String, String>> mContactList = new ArrayList<>();
@@ -46,6 +52,32 @@ public class SelectContactsActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.create_chatroom);
         mInviteButton = (Button) findViewById(R.id.invite);
 
+
+        mInviteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                List<Pair<String, String>> selected = ((SelectContactsAdapter)mListView.getAdapter()).getCheckedContacts();
+
+                String[] numbers = new String[selected.size()];
+                for (int i = 0; i < numbers.length; ++i) {
+                    numbers[i] = (selected.get(i).second);
+                }
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("selectedNumbers", numbers);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+
+            }
+        });
+
+        getSupportActionBar().setTitle("Selects Contacts");
+
+
+        getContactsPermission();
+    }
+
+    private void fillWithContacts() {
         final SelectContactsAdapter adapter = new SelectContactsAdapter(this, mContactList);
         mListView.setAdapter(adapter);
 
@@ -80,27 +112,31 @@ public class SelectContactsActivity extends AppCompatActivity {
 
 
         mListView.setAdapter(adapter);
-
-        mInviteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Pair<String, String>> selected = adapter.getCheckedContacts();
-
-                String[] numbers = new String[selected.size()];
-                for (int i = 0; i < numbers.length; ++i) {
-                    numbers[i] = (selected.get(i).second);
-                }
-
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("selectedNumbers", numbers);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
-
-            }
-        });
-
-        getSupportActionBar().setTitle("Selects contacts...");
     }
 
+    private void getContactsPermission() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
 
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CONTACTS}, CONTACTS_REQUEST);
+        } else {
+            fillWithContacts();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case CONTACTS_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fillWithContacts();
+                } else {
+                    finish();
+                }
+                break;
+            }
+        }
+    }
 }
