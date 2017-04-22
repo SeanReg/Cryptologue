@@ -6,9 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-<!--
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
--->
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -25,6 +22,13 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!--
+         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
+         Google Maps Android API v2, but you must specify either coarse or fine
+         location permissions for the 'MyLocation' functionality. 
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -83,53 +87,64 @@
         <activity
             android:name=".UI.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Dark"></activity>
+            android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".UI.SignupActivity"
             android:label="@string/title_activity_signup"
-            android:theme="@style/AppTheme.Dark"></activity>
+            android:theme="@style/AppTheme.Dark" />
         <activity
             android:name=".UI.ChatroomActivity"
+            android:icon="@drawable/arrow_bg1"
             android:label="@string/title_activity_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar"
-            android:icon="@drawable/arrow_bg1"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.ChatRoomNameActivity"
+            android:icon="@drawable/arrow_bg1"
             android:label="ChatroomNameActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar"
-            android:icon="@drawable/arrow_bg1"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.EventsActivity"
+            android:icon="@drawable/arrow_bg1"
             android:label="EventsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar"
-            android:icon="@drawable/arrow_bg1"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.PollsActivity"
+            android:icon="@drawable/arrow_bg1"
             android:label="PollsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar"
-            android:icon="@drawable/arrow_bg1"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.MembersActivity"
+            android:icon="@drawable/arrow_bg1"
             android:label="MembersActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar"
-            android:icon="@drawable/arrow_bg1"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.LeaveChatActivity"
+            android:icon="@drawable/arrow_bg1"
             android:label="LeaveChatActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar"
-            android:icon="@drawable/arrow_bg1"></activity>
-
-        <activity android:name=".UI.SelectContactsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
-
+            android:theme="@style/AppTheme.Dark.ActionBar" />
+        <activity
+            android:name=".UI.SelectContactsActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
             android:name=".UI.CreateChatroomActivity"
             android:label="@string/title_activity_create_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar"></activity>
+            android:theme="@style/AppTheme.Dark.ActionBar" />
+        <!--
+             The API key for Google Maps-based APIs is defined as a string resource.
+             (See the file "res/values/google_maps_api.xml").
+             Note that the API key is linked to the encryption key used to sign the APK.
+             You need a different API key for each encryption key, including the release key that is used to
+             sign the APK for publishing.
+             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+        -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBs4bkq34keK70SjCTG91pJjceU9Cj4dh4" />
+
     </application>
 
 </manifest>

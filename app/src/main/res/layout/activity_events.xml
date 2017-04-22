@@ -1,11 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fitsSystemWindows="true">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Events" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+        <com.teamsynergy.cryptologue.UI.EditLatoText android:id="@+id/event_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textCapWords"
+            android:hint="Event Name" />
+    </android.support.design.widget.TextInputLayout>
+
+    <EditText
+        android:id="@+id/start_date"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:hint="Select Start Date..."
+        android:padding="15dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:focusable="false" />
+    <EditText
+        android:id="@+id/end_date"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:hint="Select End Date..."
+        android:padding="15dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:focusable="false" />
+
+    <EditText
+        android:id="@+id/start_time"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:hint="Select Start Time..."
+        android:padding="15dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:editable="false"
+        android:focusable="false" />
+
+    <EditText
+        android:id="@+id/end_time"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:hint="Select Start Time..."
+        android:padding="15dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:focusable="false" />
+    <fragment
+        android:id="@+id/place_autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        />
+    <Button
+        android:id="@+id/googlemaps_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Google Maps"/>
+    <EditText
+        android:id="@+id/description"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:hint="Description"
+        android:lines="5"
+        android:padding="15dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:inputType="textMultiLine"
+        />
+
+
 </LinearLayout>
+</ScrollView>
