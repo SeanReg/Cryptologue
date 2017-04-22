@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.parse.ParseException;
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.ImageUtil;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.UserAccount;
 
@@ -212,27 +213,15 @@ public class SettingsActivity extends AppCompatActivity {
                     Bitmap imgBitmap = BitmapFactory
                             .decodeFile(imgDecodableString, options);
 
-                    int bW, bH;
-                    if (imgBitmap.getWidth() > imgBitmap.getHeight()) {
-                        bH = ((int)(imgBitmap.getHeight() / (float)imgBitmap.getWidth()
-                                * 128.0f));
-                        bW = (128);
-                    } else {
-                        bW = ((int)(imgBitmap.getWidth() / (float)imgBitmap.getHeight()
-                                * 128.0f));
-                        bH = (128);
-                    }
 
                     ContextWrapper cw = new ContextWrapper(getApplicationContext());
                     // path to /data/data/yourapp/app_data/imageDir
                     File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
                     _userAvatar = new File(directory, "temp.jpg");
 
-                    Bitmap scaledBmp = Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
+                    Bitmap scaledBmp = ImageUtil.uniformScale(imgBitmap, 128, true);
                     imgView.setImageBitmap(scaledBmp);
-                    scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
-                            new FileOutputStream(_userAvatar));
-                    imgBitmap.recycle();
+                    scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90, new FileOutputStream(_userAvatar));
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
                             Toast.LENGTH_LONG).show();
