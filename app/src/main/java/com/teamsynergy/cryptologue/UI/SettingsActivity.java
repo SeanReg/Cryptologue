@@ -4,12 +4,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -19,6 +22,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import com.parse.ParseException;
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.ImageUtil;
+import com.teamsynergy.cryptologue.Manifest;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.UserAccount;
 
@@ -27,8 +32,6 @@ import java.io.FileOutputStream;
 
 
 public class SettingsActivity extends AppCompatActivity {
-
-    private static int RESULT_LOAD_IMG = 1;
     String imgDecodableString = null;
     File _userAvatar = null;
 
@@ -49,10 +52,10 @@ public class SettingsActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(SettingsActivity.this, R.style.AppTheme_Dark_Dialog);
 
-        _nameText = ((EditText)findViewById(R.id.input_name));
-        _usernameText = ((EditText)findViewById(R.id.input_username));
-        _passwordText = ((EditText)findViewById(R.id.input_password));
-        _saveButton = ((Button)findViewById(R.id.btn_save));
+        _nameText = ((EditText) findViewById(R.id.input_name));
+        _usernameText = ((EditText) findViewById(R.id.input_username));
+        _passwordText = ((EditText) findViewById(R.id.input_password));
+        _saveButton = ((Button) findViewById(R.id.btn_save));
 
         _usernameText.setText(manager.getCurrentAccount().getUsername());
         _nameText.setText(manager.getCurrentAccount().getDisplayName());
@@ -67,12 +70,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        _uploadUserAvatar = ((ImageView)findViewById(R.id.userAvatar));
+        _uploadUserAvatar = ((ImageView) findViewById(R.id.userAvatar));
 
         _uploadUserAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                upload();
+                showImagePicker();
             }
         });
 
@@ -109,11 +112,16 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onSave() {
                 onSaveSuccess();
-            };
+            }
+
+            ;
+
             @Override
             public void onSaveError(ParseException e) {
                 onSaveFailed(e);
-            };
+            }
+
+            ;
         });
     }
 
@@ -175,64 +183,19 @@ public class SettingsActivity extends AppCompatActivity {
         }
     };
 
-    public void upload() {
-        // Create intent to Open Image applications like Gallery, Google Photos
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG) {
+            if (requestCode == ImageUtil.RESULT_LOAD_IMG) {
                 if (resultCode == RESULT_OK && null != data) {
 
-                    // Get the Image from data
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    // Get the cursor
-                    Cursor cursor = getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imgDecodableString = cursor.getString(columnIndex);
-
-                    cursor.close();
+                    Bitmap scaledBmp = ImageUtil.imagePickerResult(this, data, 128);
                     ImageView imgView = (ImageView) findViewById(R.id.userAvatar);
-                    // Set the Image in ImageView after decoding the
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inMutable=true;
-                    Bitmap imgBitmap = BitmapFactory
-                            .decodeFile(imgDecodableString, options);
-
-                    int bW, bH;
-                    if (imgBitmap.getWidth() > imgBitmap.getHeight()) {
-                        bH = ((int)(imgBitmap.getHeight() / (float)imgBitmap.getWidth()
-                                * 128.0f));
-                        bW = (128);
-                    } else {
-                        bW = ((int)(imgBitmap.getWidth() / (float)imgBitmap.getHeight()
-                                * 128.0f));
-                        bH = (128);
-                    }
-
-                    ContextWrapper cw = new ContextWrapper(getApplicationContext());
-                    // path to /data/data/yourapp/app_data/imageDir
-                    File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-                    _userAvatar = new File(directory, "temp.jpg");
-
-                    Bitmap scaledBmp = Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
                     imgView.setImageBitmap(scaledBmp);
-                    scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
-                            new FileOutputStream(_userAvatar));
-                    imgBitmap.recycle();
+
+                    _userAvatar = ImageUtil.tempSaveCompressedBitmap(this, scaledBmp);
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
                             Toast.LENGTH_LONG).show();
@@ -246,6 +209,32 @@ public class SettingsActivity extends AppCompatActivity {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    private void showImagePicker() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, ImageUtil.READ_IMAGE_PERMISSION);
+        } else {
+            ImageUtil.showImagePicker(this);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ImageUtil.READ_IMAGE_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    ImageUtil.showImagePicker(this);
+                } else {
+
+                }
+                break;
+            }
+
+        }
+    }
+
 }
-
-

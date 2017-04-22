@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,8 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -26,6 +29,8 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.ImageUtil;
+import com.teamsynergy.cryptologue.Manifest;
 import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;
@@ -40,7 +45,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
 
     private static int RESULT_LOAD_IMG = 1;
     private static int RESULT_SELECT_CONTACTS = 2;
-    String imgDecodableString = null;
+    File imgDecodableFile = null;
 
     EditText _nameText;
     Button _uploadChatAvatar;
@@ -60,7 +65,7 @@ public class CreateChatroomActivity extends AppCompatActivity {
         _uploadChatAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                upload();
+                showImagePicker();
             }
         });
 
@@ -80,64 +85,18 @@ public class CreateChatroomActivity extends AppCompatActivity {
         // send name and photo
     }
 
-    public void upload() {
-        // Create intent to Open Image applications like Gallery, Google Photos
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             // When an Image is picked
-            if (requestCode == RESULT_LOAD_IMG) {
+            if (requestCode == ImageUtil.RESULT_LOAD_IMG) {
                 if (resultCode == RESULT_OK && null != data) {
 
-                    // Get the Image from data
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    // Get the cursor
-                    Cursor cursor = getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    // Move to first row
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    imgDecodableString = cursor.getString(columnIndex);
-
-                    cursor.close();
+                    Bitmap scaledBmp = ImageUtil.imagePickerResult(this, data, 128);
                     ImageView imgView = (ImageView) findViewById(R.id.chatAvatar);
-                    // Set the Image in ImageView after decoding the
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inMutable=true;
-                    Bitmap imgBitmap = BitmapFactory
-                            .decodeFile(imgDecodableString, options);
-
-                    int bW, bH;
-                    if (imgBitmap.getWidth() > imgBitmap.getHeight()) {
-                        bH = ((int)(imgBitmap.getHeight() / (float)imgBitmap.getWidth()
-                                * 128.0f));
-                        bW = (128);
-                    } else {
-                        bW = ((int)(imgBitmap.getWidth() / (float)imgBitmap.getHeight()
-                                * 128.0f));
-                        bH = (128);
-                    }
-
-                    ContextWrapper cw = new ContextWrapper(getApplicationContext());
-                    // path to /data/data/yourapp/app_data/imageDir
-                    File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-
-                    Bitmap scaledBmp = Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
                     imgView.setImageBitmap(scaledBmp);
-                    scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
-                            new FileOutputStream(new File(directory, "temp1.jpg")));
-                    imgBitmap.recycle();
-
+                    imgDecodableFile = ImageUtil.tempSaveCompressedBitmap(this, scaledBmp);
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
                             Toast.LENGTH_LONG).show();
@@ -150,8 +109,8 @@ public class CreateChatroomActivity extends AppCompatActivity {
                         public void onUsersFound(List<User> users) {
                             Chatroom.Builder builder = new Chatroom.Builder();
                             builder.setName(_nameText.getText().toString());
-                            if (imgDecodableString != null)
-                                builder.setImage(new File(imgDecodableString));
+                            if (imgDecodableFile != null)
+                                builder.setImage(imgDecodableFile);
                             for (User usr : users) {
                                 builder.addMember(usr);
                             }
@@ -177,5 +136,32 @@ public class CreateChatroomActivity extends AppCompatActivity {
                     .show();
         }
 
+    }
+
+    private void showImagePicker() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, ImageUtil.READ_IMAGE_PERMISSION);
+        } else {
+            ImageUtil.showImagePicker(this);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case ImageUtil.READ_IMAGE_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    ImageUtil.showImagePicker(this);
+                } else {
+
+                }
+                break;
+            }
+
+        }
     }
 }
