@@ -26,6 +26,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.ImageUtil;
 import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;
@@ -117,26 +118,14 @@ public class CreateChatroomActivity extends AppCompatActivity {
                     Bitmap imgBitmap = BitmapFactory
                             .decodeFile(imgDecodableString, options);
 
-                    int bW, bH;
-                    if (imgBitmap.getWidth() > imgBitmap.getHeight()) {
-                        bH = ((int)(imgBitmap.getHeight() / (float)imgBitmap.getWidth()
-                                * 128.0f));
-                        bW = (128);
-                    } else {
-                        bW = ((int)(imgBitmap.getWidth() / (float)imgBitmap.getHeight()
-                                * 128.0f));
-                        bH = (128);
-                    }
-
                     ContextWrapper cw = new ContextWrapper(getApplicationContext());
                     // path to /data/data/yourapp/app_data/imageDir
                     File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
 
-                    Bitmap scaledBmp = Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
+                    Bitmap scaledBmp = ImageUtil.uniformScale(imgBitmap, 128, true);//Bitmap.createScaledBitmap(imgBitmap, bW, bH, false);
                     imgView.setImageBitmap(scaledBmp);
                     scaledBmp.compress(Bitmap.CompressFormat.JPEG, 90,
                             new FileOutputStream(new File(directory, "temp1.jpg")));
-                    imgBitmap.recycle();
 
                 } else {
                     Toast.makeText(this, "You haven't picked an image",
