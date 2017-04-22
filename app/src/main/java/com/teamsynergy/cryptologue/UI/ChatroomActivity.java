@@ -52,6 +52,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
 
     private Button buttonChatRoomName;
+    private Button buttonCreatePoll;
     private Button buttonEvents;
     private Button buttonPolls;
     private Button buttonMembers;
@@ -73,6 +74,7 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonSend = (Button) findViewById(R.id.send);
 
         buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
+        buttonCreatePoll = (Button) findViewById(R.id.create_poll_button);
         buttonEvents = (Button) findViewById(R.id.events_button);
         buttonPolls = (Button) findViewById(R.id.polls_button);
         buttonMembers = (Button) findViewById(R.id.members_button);
@@ -114,6 +116,13 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), ChatRoomNameActivity.class));
+            }
+        });
+
+        buttonCreatePoll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
             }
         });
 

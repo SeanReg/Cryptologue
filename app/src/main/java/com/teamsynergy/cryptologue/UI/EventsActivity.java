@@ -98,9 +98,6 @@ public class EventsActivity extends AppCompatActivity {
             }
         });
 
-
-
-
     }
 
 
@@ -130,8 +127,6 @@ public class EventsActivity extends AppCompatActivity {
 
         };
     }
-
-
 
 
     private View.OnClickListener createClockListener() {
