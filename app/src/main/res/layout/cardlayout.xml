@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:background="@color/white"
     android:foreground="?android:attr/selectableItemBackground">
 
-    <ImageView
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
-        android:gravity="end"
-        android:layout_alignParentEnd="true"
+    <RelativeLayout
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:id="@+id/chatAvatar"
-        android:src="@drawable/user_placeholder">
-    </ImageView>
+        android:layout_weight="1">
 
-    <com.teamsynergy.cryptologue.UI.TextLatoView
-        android:id="@+id/roomName"
-        android:textColor="@android:color/darker_gray"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding = "8dp"
-        android:ellipsize="marquee"
-        android:singleLine="true"
-        android:text="ChatRoomName"
-        android:textSize="20sp" />
+        <com.teamsynergy.cryptologue.UI.TextLatoView
+            android:gravity="start"
+            android:id="@+id/roomName"
+            android:textColor="@android:color/darker_gray"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding = "8dp"
+            android:ellipsize="marquee"
+            android:singleLine="true"
+            android:text="ChatRoomName"
+            android:textSize="20sp" />
 
-</RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <ImageView
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingRight="2dp"
+            android:layout_height="match_parent"
+            android:layout_width="194dp"
+            android:id="@+id/chatAvatar"
+            android:src="@drawable/group_placeholder"
+            android:layout_marginStart="94dp"
+            android:layout_alignParentTop="true">
+        </ImageView>
+
+    </RelativeLayout>
+</LinearLayout>
 
 
