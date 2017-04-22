@@ -58,14 +58,18 @@ public class UserAccount extends User implements SecurityCheck {
     }
 
     public void getImage(final UserAccount.Callbacks listener) {
-        getParseUser().getParseFile(AccountManager.FIELD_AVATAR)
-                .getFileInBackground(new GetFileCallback() {
-                    @Override
-                    public void done(File file, ParseException e) {
-                        if (e != null) return;
-                        listener.onGotProfilePicture(file);
-                    }
-                });
+        ParseFile avatar = getParseUser().getParseFile(AccountManager.FIELD_AVATAR);
+
+        if (avatar == null)
+            return;
+
+        avatar.getFileInBackground(new GetFileCallback() {
+                @Override
+                public void done(File file, ParseException e) {
+                    if (e != null) return;
+                    listener.onGotProfilePicture(file);
+                }
+            });
     }
 
     public static abstract class Callbacks {
