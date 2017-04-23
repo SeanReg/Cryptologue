@@ -77,8 +77,9 @@ public class PollsActivity extends AppCompatActivity{
                         }
 
                         BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints.toArray(new DataPoint[dataPoints.size()]));
-                        graph.addSeries(series);
 
+                        graph.addSeries(series);
+                        graph.getViewport().setMinY(0);
                         series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
                             @Override
                             public int get(DataPoint data) {
