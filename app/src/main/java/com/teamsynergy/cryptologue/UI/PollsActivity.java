@@ -62,6 +62,10 @@ public class PollsActivity extends AppCompatActivity{
                         LinearLayout parent = (LinearLayout)findViewById(R.id.poll_result_layout);
 
                         ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
+                        for (int i = 0; i < 4; ++ i){
+                            dataPoints.add(new DataPoint(i, 0));
+                        }
+
                         for(int i = 0; i < options.size(); ++i) {
                             LinearLayout optionLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.poll_option, null);
                             ((TextView)optionLayout.findViewById(R.id.option_texts)).setText(options.get(i).getDescription());
@@ -69,7 +73,7 @@ public class PollsActivity extends AppCompatActivity{
                                 ((CheckBox)optionLayout.findViewById(R.id.option)).setVisibility(View.GONE);
                             parent.addView(optionLayout);
                             optionsArray.add(new Pair<LinearLayout, Poll.PollOption>(optionLayout, options.get(i)));
-                            dataPoints.add(new DataPoint(i, options.get(i).getVotes()));
+                            dataPoints.set(i, new DataPoint(i, options.get(i).getVotes()));
                         }
 
                         BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints.toArray(new DataPoint[dataPoints.size()]));
