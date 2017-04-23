@@ -20,7 +20,13 @@ import java.util.ArrayList;
  * Created by Sean on 3/23/2017.
  */
 
+/**
+ * Class that handles security and authentication for UserAccounts
+ */
 public class AccountManager {
+    /**
+     * Single instance of AccountManager
+     */
     private static final AccountManager mInstance = new AccountManager();
 
     private final ArrayList<SecurityCheck> mSecurityObjs = new ArrayList<>();
@@ -29,30 +35,43 @@ public class AccountManager {
      * The constant FIELD_USERNAME_CASE.
      */
     public static final String FIELD_USERNAME_CASE  = "usernameCase";
+
     /**
      * The constant FIELD_USERNAME.
      */
     public static final String FIELD_USERNAME       = "username";
+
     /**
      * The constant FIELD_PHONE_NUMBER.
      */
     public static final String FIELD_PHONE_NUMBER   = "phone";
+
     /**
      * The constant FIELD_DISPLAY_NAME.
      */
     public static final String FIELD_DISPLAY_NAME   = "displayName";
+
     /**
      * The constant FIELD_AVATAR.
      */
     public static final String FIELD_AVATAR   = "avatar";
 
+    /**
+     * Current UserAccount
+     */
     private UserAccount mCurAccount = null;
 
-
+    /**
+     * Constructs an AccountManager
+     */
     private AccountManager() {
 
     }
 
+    /**
+     * Provides an instance of the AccountManager
+     * @return  Singleton instance of AccountManager
+     */
     public static AccountManager getInstance() {
         if (mInstance.mCurAccount == null && ParseUser.getCurrentUser() != null)
             mInstance.constructCurrentAccount();
@@ -60,6 +79,10 @@ public class AccountManager {
         return mInstance;
     }
 
+    /**
+     * Provides the current UserAccount logged in
+     * @return  Current UserAccount logged in
+     */
     public UserAccount getCurrentAccount() {
         return mCurAccount;
     }
@@ -68,13 +91,14 @@ public class AccountManager {
      * Registers a new user with the Parse server. A successful registration
      * will produce a onRegistered callback. If there were errors while registering then
      * a onRegistrationError callback will occur
-     * @param username the username of the new account - an error will be produced if this
+     * @param username  the username of the new account - an error will be produced if this
      * username is already taken
-     * @param password    the password  the password of the account - must meet a length requirement
-     * of 8
-     * @param displayName the display name for the account
-     * @param phone       (optional) the phonenumber for the account allowing a user to be searched
+     * @param password  the password of the account - must meet a length requirement of 4
+     * @param displayName   the display name for the account
+     * @param phone the phone number for the account allowing a user to be searched
      * by their phone number
+     * @param callback  successfully registers and logs user in or produces a onRegistrationError callback
+     *                  that returns error from registration validation
      */
     public void register(String username, String displayName, String password, String phone, final onAccountStatus callback) {
         ParseUser user = new ParseUser();
@@ -107,6 +131,8 @@ public class AccountManager {
      * then a session token is returned, allowing the user to remain logged in until they sign out
      * @param username the username of the user's account
      * @param password the password of the user's account
+     * @param callback  either logs user in order produces an onLoginError that returns ParseException
+     *                  to user
      */
     public void login(String username, String password, final onAccountStatus callback) {
         // if (isSignedIn()) logOut();
@@ -132,6 +158,16 @@ public class AccountManager {
         }
     }
 
+    /**
+     *
+     * @param username  the updated username of the user's account
+     * @param displayName   the updated display name of the user's account
+     * @param password  the updated password of the user's account
+     * @param phone     the phone number of the user's account - does not get updated
+     * @param avatar    the profile picture of the user's account
+     * @param callback  produces an onSave successful or onSaveError callback to denote what succeeded
+     *                  and what went wrong upon update
+     */
     public void updateAccount(String username, String displayName, String password, String phone, File avatar, final onAccountStatus callback) {
         ParseUser user = ParseUser.getCurrentUser();
         //user.setEmail(username);
@@ -158,6 +194,9 @@ public class AccountManager {
         });
     }
 
+    /**
+     * Constructs a UserAccount object from the current ParseUser
+     */
     private void constructCurrentAccount() {
         ParseUser pUser = ParseUser.getCurrentUser();
         mCurAccount = new UserAccount(pUser.getUsername(), (String)pUser.get("displayName"), (String)pUser.get("phone"), pUser);
@@ -216,7 +255,7 @@ public class AccountManager {
          * Called when an authentication error has occured
          * with the Parse server while attempting to log a user
          * in
-         * @param e contains the ParseException and reason that the the login failed
+         * @param e contains the ParseException and reason that the login failed
          */
         public void onLoginError(ParseException e) {};
 
@@ -228,8 +267,16 @@ public class AccountManager {
          */
         public void onRegistrationError(ParseException e) {};
 
+        /**
+         * Called when a user has successfully updated their account settings
+         */
         public void onSave() {};
 
+        /**
+         * Called when a validation error occured when attempting to save
+         * account settings
+         * @param e contains the ParseException and reason that the save failed
+         */
         public void onSaveError(ParseException e) {};
     }
 }
