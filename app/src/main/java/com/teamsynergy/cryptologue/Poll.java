@@ -157,7 +157,7 @@ public class Poll extends ChatFunction {
                                 public void done(ParseException e) {
                                     mCFunction.mParseObj = poll;
 
-                                    ParseObject pRoom = ParseObject.createWithoutData("Chatroom", chatroom.getId());
+                                    ParseObject pRoom = ParseObject.createWithoutData("Chatrooms", chatroom.getId());
                                     pRoom.getRelation("polls").add(poll);
                                     pRoom.saveInBackground();
                                 }

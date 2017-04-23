@@ -153,6 +153,7 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonCreatePoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ObjectPasser.putObject("chatroomPoll", mChatroom);
                 startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
             }
         });
