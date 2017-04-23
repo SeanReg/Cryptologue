@@ -2,6 +2,7 @@ package com.teamsynergy.cryptologue;
 
 import android.util.Pair;
 
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
@@ -41,10 +42,13 @@ public class Poll extends ChatFunction {
         }
 
         public void addVotingOption(String option) {
+            if (option.trim().length() == 0)
+                return;
+
             mPoll.mOptions.add(option);
         }
 
-        public Poll build(boolean isNew) {
+        public Poll build(boolean isNew, final Chatroom chatroom) {
             if (isNew) {
                 final ParseObject poll = new ParseObject("Polls");
                 poll.put("name", mCFunction.mName);
@@ -62,8 +66,16 @@ public class Poll extends ChatFunction {
                 ParseObject.saveAllInBackground(optionsList, new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
-                        if (e == null)
-                            poll.saveInBackground();
+                        if (e == null) {
+                            poll.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(ParseException e) {
+                                    ParseObject pRoom = ParseObject.createWithoutData("Chatroom", chatroom.getId());
+                                    pRoom.getRelation("polls").add(poll);
+                                    pRoom.saveInBackground();
+                                }
+                            });
+                        }
                     }
                 });
             } else {
