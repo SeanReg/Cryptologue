@@ -117,7 +117,7 @@ public class ChatroomActivity extends AppCompatActivity {
                         public void onGotProfilePicture(File image) {
                             mMembers.add(new Pair<>(member, image));
                             if(mMembers.size() == members.size()) {
-                                mChatroom.getCachedMessages(mMessageRecieved);
+                                mChatroom.getCachedMessages(mMessageRecieved, null);
                             }
                         }
                     });

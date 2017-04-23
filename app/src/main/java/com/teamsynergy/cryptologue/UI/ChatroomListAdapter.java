@@ -33,6 +33,7 @@ public class ChatroomListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private ArrayList<Chatroom> mDataSource;
     private HashMap<String, Bitmap> mDataBitmaps = new HashMap<>();
+    private HashMap<String, String> mLastMsg     = new HashMap<>();
     private ArrayList<String> mMessage;
 
 
@@ -69,14 +70,19 @@ public class ChatroomListAdapter extends BaseAdapter {
         final Chatroom room = (Chatroom) getItem(position);
         final String name = room.getName();
 
-        room.getCachedMessages(new MessagingService.MessageListener() {
-            @Override
-            public void onMessageRecieved(Message s) {
-                String lastMessage = "";
-                lastMessage = s.getText();
-                messagePreview.setText(lastMessage);
-            }
-        });
+        if (!mLastMsg.containsKey(room.getId())) {
+            room.getCachedMessages(new MessagingService.MessageListener() {
+                @Override
+                public void onMessageRecieved(Message s) {
+                    mLastMsg.put(room.getId(), s.getText());
+                    messagePreview.setText(s.getText());
+                }
+            }, 1);
+        } else {
+            messagePreview.setText(mLastMsg.get(room.getId()));
+        }
+
+
         if (!mDataBitmaps.containsKey(room.getId())) {
             room.getImage(new GetDataCallback() {
                 @Override

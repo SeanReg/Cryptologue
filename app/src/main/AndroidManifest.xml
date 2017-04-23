@@ -38,7 +38,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".UI.HomepageActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar">
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -87,65 +88,79 @@
         <activity
             android:name=".UI.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme.Dark"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.SignupActivity"
             android:label="@string/title_activity_signup"
-            android:theme="@style/AppTheme.Dark" />
+            android:theme="@style/AppTheme.Dark"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.ChatroomActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="@string/title_activity_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.ChatRoomNameActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="ChatroomNameActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.CreateEventActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="EventsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.EventActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="EventsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.PollsActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="PollsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.MembersActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="MembersActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.LeaveChatActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="LeaveChatActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.SelectContactsActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.CreateChatroomActivity"
             android:label="@string/title_activity_create_chatroom"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.CreatePollActivity"
             android:label="CreatePollActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.ChatFunctionActivity"
             android:label="ChatFunctionActivity"
-            android:theme="@style/AppTheme.Dark.ActionBar" />
+            android:theme="@style/AppTheme.Dark.ActionBar"
+            android:screenOrientation="portrait"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
