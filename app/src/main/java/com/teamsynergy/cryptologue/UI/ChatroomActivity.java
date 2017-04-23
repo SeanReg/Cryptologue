@@ -118,7 +118,7 @@ public class ChatroomActivity extends AppCompatActivity {
                         public void onGotProfilePicture(File image) {
                             mMembers.add(new Pair<>(member, image));
                             if(mMembers.size() == members.size()) {
-                                mChatroom.getCachedMessages(mMessageRecieved);
+                                mChatroom.getCachedMessages(mMessageRecieved, null);
                             }
                         }
                     });
@@ -177,7 +177,14 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonMembers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), MembersActivity.class));
+//                ArrayList<String> members = new ArrayList<String>();
+                Intent intent = new Intent(getApplicationContext(), MembersActivity.class);
+//                for(Pair<User, File> member : mMembers ) {
+//                    members.add(member.first.getUsername());
+//                }
+//                intent.putStringArrayListExtra("members", members);
+                ObjectPasser.putObject("members", mMembers);
+                startActivity(intent);
             }
         });
 

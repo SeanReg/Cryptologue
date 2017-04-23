@@ -1,5 +1,6 @@
 package com.teamsynergy.cryptologue.UI;
 
+import android.accounts.Account;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -107,7 +108,7 @@ public class SettingsActivity extends AppCompatActivity {
         String name = _nameText.getText().toString();
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
-        String phone = "9542549695";
+        String phone = AccountManager.getInstance().getCurrentAccount().getPhoneNumber();
 
         manager.updateAccount(username, name, password, phone, _userAvatar, new AccountManager.onAccountStatus() {
             @Override

@@ -91,7 +91,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Signup failed", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }
@@ -102,9 +102,17 @@ public class SignupActivity extends AppCompatActivity {
         String name = _nameText.getText().toString();
         String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
+        String phone = PhoneNumberUtils.formatNumberToE164(_phoneNumberText.getText().toString(), "US");
 
         if (name.isEmpty() || name.length() < 3) {
             _nameText.setError("at least 3 characters");
+            valid = false;
+        } else {
+            _nameText.setError(null);
+        }
+
+        if (phone == null || phone.length() != 10 || phone.isEmpty()) {
+            _phoneNumberText.setError("invalid phone number");
             valid = false;
         } else {
             _nameText.setError(null);
