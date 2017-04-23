@@ -32,7 +32,7 @@ public class ChatFunctionActivity extends AppCompatActivity {
         mInstance = this;
 
         mListView = (ListView) findViewById(R.id.chatfunctions_list);
-        mChatFunctionAdapter = new ChatFunctionAdapter(this, mChatFunctionList);
+        mChatFunctionAdapter = new ChatFunctionAdapter(this, mChatFunctionList, PollsActivity.class);
         mListView.setAdapter(mChatFunctionAdapter);
     }
 
