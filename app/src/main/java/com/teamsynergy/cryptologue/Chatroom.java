@@ -75,10 +75,11 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         msgObject.pinInBackground();
     }
 
-    public void getCachedMessages(final MessagingService.MessageListener listener) {
+    public void getCachedMessages(final MessagingService.MessageListener listener, Integer limit) {
         ParseQuery query = new ParseQuery("Messages");
         query.orderByAscending("createdAt");
         query.whereEqualTo("chatroomId", mParseObj.getObjectId());
+        if (limit != null) query.setLimit(limit);
         query.fromLocalDatastore();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
