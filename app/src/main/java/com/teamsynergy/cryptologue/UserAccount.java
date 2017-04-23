@@ -17,13 +17,27 @@ import java.util.List;
  * Created by Sean on 3/23/2017.
  */
 
+/**
+ * Class that extends User to manipulate the current account
+ */
 public class UserAccount extends User implements SecurityCheck {
     private boolean mIsValid = true;
 
+    /**
+     * Constructs a UserAccount
+     * @param username
+     * @param displayName
+     * @param phonenumber
+     * @param parseUser
+     */
     public UserAccount(String username, String displayName, String phonenumber, ParseUser parseUser) {
         super(username, displayName, phonenumber, parseUser);
     }
 
+    /**
+     * Queries for the chatrooms user is a participant of
+     * @param listener  listens for the list of chatrooms
+     */
     public void getChatrooms(final UserAccount.Callbacks listener) {
         if (mIsValid) {
             ParseQuery query = new ParseQuery("RoomLookup");
@@ -57,6 +71,9 @@ public class UserAccount extends User implements SecurityCheck {
         mIsValid = false;
     }
 
+    /**
+     * Class for callback that returns list of chatrooms
+     */
     public static abstract class Callbacks {
         public void onGotChatrooms(List<Chatroom> rooms) {
 
