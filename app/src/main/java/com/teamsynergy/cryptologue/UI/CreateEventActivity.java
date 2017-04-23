@@ -72,28 +72,9 @@ public class CreateEventActivity extends AppCompatActivity {
 
             }
         });
-        buttonOpenGoogleMaps= (Button) findViewById(R.id.googlemaps_button);
-        buttonOpenGoogleMaps.setOnClickListener(new View.OnClickListener(){
 
-            @Override
-            public void onClick(View view) {
-                if (mSelectedPlace == null)
-                    return;
-
-                Uri gmmIntentUri = Uri.parse("geo:" + mSelectedPlace.getLatLng().latitude + "," +
-                    mSelectedPlace.getLatLng().longitude + "?q=" + mSelectedPlace.getAddress().toString());
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
-                }
-
-            }
-        });
         buttonSubmit = (Button) findViewById(R.id.submit_button);
         buttonSubmit.setOnClickListener(new View.OnClickListener(){
-
-
             @Override
             public void onClick(View view) {
                 mStartDate.getText();
@@ -109,9 +90,6 @@ public class CreateEventActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
-
 
     }
 
@@ -144,8 +122,6 @@ public class CreateEventActivity extends AppCompatActivity {
 
         };
     }
-
-
 
 
     private View.OnClickListener createClockListener() {

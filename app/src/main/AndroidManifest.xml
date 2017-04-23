@@ -138,6 +138,10 @@
             android:name=".UI.CreateChatroomActivity"
             android:label="@string/title_activity_create_chatroom"
             android:theme="@style/AppTheme.Dark.ActionBar" />
+        <activity
+            android:name=".UI.CreatePollActivity"
+            android:label="CreatePollActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
