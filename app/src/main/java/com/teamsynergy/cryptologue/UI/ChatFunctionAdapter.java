@@ -27,6 +27,10 @@ public class ChatFunctionAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    public void setChatFunctions(ArrayList<ChatFunction> chatFunctions) {
+        mDataSource = chatFunctions;
+    }
+
     @Override
     public int getCount() {
         return mDataSource.size();

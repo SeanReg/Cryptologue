@@ -37,6 +37,7 @@ import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.Message;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ObjectPasser;
+import com.teamsynergy.cryptologue.Poll;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
 import com.teamsynergy.cryptologue.User;
@@ -59,7 +60,6 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
 
     private Button buttonChatRoomName;
-    private Button buttonChatFunctions;
     private Button buttonCreateEvent;
     private Button buttonCreatePoll;
     private Button buttonPolls;
@@ -86,7 +86,6 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonSend = (Button) findViewById(R.id.send);
 
         buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
-        buttonChatFunctions = (Button) findViewById(R.id.chatfunctions_button);
         buttonCreateEvent = (Button) findViewById(R.id.create_events_button);
         buttonCreatePoll = (Button) findViewById(R.id.create_poll_button);
         buttonEvents = (Button) findViewById(R.id.events_button);
@@ -151,13 +150,6 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        buttonChatFunctions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
-            }
-        });
-
         buttonCreatePoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,7 +167,9 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonPolls.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), PollsActivity.class));
+                mChatroom.getChatFunctions(Poll.class, ChatFunctionActivity.chatFunctionsListener());
+
+                startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
             }
         });
 

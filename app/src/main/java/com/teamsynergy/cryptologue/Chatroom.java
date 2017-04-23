@@ -15,8 +15,11 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -165,34 +168,35 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             }
         });
     }
-/*    @Override
-    public int describeContents() {
-        return 0;
+
+    public void getChatFunctions(final Class<? extends ChatFunction> funcClass, final GotChatFunctionsListener listener) {
+        String dbName = (funcClass.getSimpleName() + "s").toLowerCase();
+        ParseQuery query = mParseObj.getRelation(dbName).getQuery();
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e != null)
+                    return;
+
+                try {
+                    Class[] classes = funcClass.getDeclaredClasses();
+                    Class builderC = null;
+                    for (Class c : classes) {
+                        if (c.getSuperclass() == ChatFunction.Builder.class) {
+                            builderC = c;
+                            break;
+                        }
+                    }
+                    Method build = builderC.getMethod("buildFromParseObjects",
+                            new Class[]{ArrayList.class, Chatroom.class});
+                    ArrayList<ChatFunction> functions = (ArrayList<ChatFunction>)build.invoke(null, objects, Chatroom.this);
+                    listener.onGotChatFuntions(functions);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
     }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mName);
-        dest.writeList(mMembers);
-        dest.writeString(mParseObj.getObjectId());
-    }
-
-    public static final Parcelable.Creator<Chatroom> CREATOR = new Parcelable.Creator<Chatroom>() {
-        public Chatroom createFromParcel(Parcel in) {
-            return new Chatroom(in);
-        }
-
-        public Chatroom[] newArray(int size) {
-            return new Chatroom[size];
-        }
-    };
-
-    private Chatroom(Parcel in) {
-        mName = in.readString();
-        in.readList(mMembers, getClass().getClassLoader());
-
-        mParseObj = ParseObject.createWithoutData("Chatrooms", in.readString());
-    }*/
 
     public static class Builder {
         private Chatroom mChatroom = new Chatroom();
@@ -268,5 +272,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
     public interface GotMembersListener {
         void onGotMembers(List<User> members);
+    }
+
+    public interface GotChatFunctionsListener {
+        void onGotChatFuntions(List<ChatFunction> functions);
     }
 }

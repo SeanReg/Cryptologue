@@ -1,6 +1,7 @@
 package com.teamsynergy.cryptologue;
 
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 import java.util.Date;
 

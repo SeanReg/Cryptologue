@@ -61,7 +61,7 @@ public class HomepageActivity extends AppCompatActivity {
 
         mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList);
         mListView.setAdapter(mChatroomAdapter);
-        
+
     }
 
 

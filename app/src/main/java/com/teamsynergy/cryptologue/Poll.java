@@ -8,6 +8,7 @@ import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.SaveCallback;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,6 +71,8 @@ public class Poll extends ChatFunction {
                             poll.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
+                                    mCFunction.mParseObj = poll;
+
                                     ParseObject pRoom = ParseObject.createWithoutData("Chatroom", chatroom.getId());
                                     pRoom.getRelation("polls").add(poll);
                                     pRoom.saveInBackground();
@@ -83,6 +86,18 @@ public class Poll extends ChatFunction {
             }
 
             return mPoll;
+        }
+
+        public static ArrayList<Poll> buildFromParseObjects(ArrayList<ParseObject> objects, Chatroom room) {
+            ArrayList<Poll> polls = new ArrayList<>();
+            for (ParseObject obj : objects) {
+                Poll.Builder poll = new Builder();
+                poll.setParseObject(obj);
+                poll.setName(obj.getString("name"));
+                polls.add(poll.build(false, room));
+            }
+
+            return polls;
         }
     }
 }
