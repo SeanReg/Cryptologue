@@ -61,20 +61,23 @@ public class HomepageActivity extends AppCompatActivity {
 
         mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList);
         mListView.setAdapter(mChatroomAdapter);
+        
+    }
+
+
+    public void onStart(){
+        super.onStart();
+
 
         if (AccountManager.getInstance().getCurrentAccount() == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivityForResult(intent, RESULT_LOGGED_IN);
         } else {
             updateChatrooms();
+
         }
-/*        Chatroom.Builder cB = new Chatroom.Builder();
-        cB.setName("Tetst");
-        cB.build(true);*/
-
-
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -126,6 +129,7 @@ public class HomepageActivity extends AppCompatActivity {
         curAcc.getChatrooms(new UserAccount.Callbacks() {
             @Override
             public void onGotChatrooms(List<Chatroom> rooms) {
+                mChatroomList.clear();
                 for (Chatroom room : rooms) {
                     //Log.d("Room", room.getName());
                     mChatroomList.add(room);
