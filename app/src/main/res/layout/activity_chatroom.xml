@@ -44,12 +44,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Chatroom Name"/>
-
         <Button
-            android:id="@+id/events_button"
+            android:id="@+id/event_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Events (#)"/>
+            android:text="On going Events"/>
+
+        <Button
+            android:id="@+id/create_events_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Events (#)"/>
 
         <Button
             android:id="@+id/polls_button"

@@ -103,7 +103,12 @@
             android:label="ChatroomNameActivity"
             android:theme="@style/AppTheme.Dark.ActionBar" />
         <activity
-            android:name=".UI.EventsActivity"
+            android:name=".UI.CreateEventActivity"
+            android:icon="@drawable/arrow_bg1"
+            android:label="EventsActivity"
+            android:theme="@style/AppTheme.Dark.ActionBar" />
+        <activity
+            android:name=".UI.EventActivity"
             android:icon="@drawable/arrow_bg1"
             android:label="EventsActivity"
             android:theme="@style/AppTheme.Dark.ActionBar" />

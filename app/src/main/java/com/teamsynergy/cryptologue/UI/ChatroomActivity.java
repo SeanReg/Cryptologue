@@ -1,7 +1,5 @@
 package com.teamsynergy.cryptologue.UI;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
@@ -9,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +20,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -42,9 +37,6 @@ import com.teamsynergy.cryptologue.UserAccount;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.inputmethod.InputMethodManager;
 
-
-import static android.app.ActionBar.DISPLAY_SHOW_CUSTOM;
-
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
 
@@ -56,10 +48,11 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
 
     private Button buttonChatRoomName;
-    private Button buttonEvents;
+    private Button buttonCreateEvent;
     private Button buttonPolls;
     private Button buttonMembers;
     private Button buttonLeaveChat;
+    private Button buttonEvents;
 
 
     private Chatroom mChatroom = null;
@@ -77,10 +70,11 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonSend = (Button) findViewById(R.id.send);
 
         buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
-        buttonEvents = (Button) findViewById(R.id.events_button);
+        buttonCreateEvent = (Button) findViewById(R.id.create_events_button);
         buttonPolls = (Button) findViewById(R.id.polls_button);
         buttonMembers = (Button) findViewById(R.id.members_button);
         buttonLeaveChat = (Button) findViewById(R.id.leave_chat_button);
+        buttonEvents=(Button) findViewById(R.id.event_button);
 
 
         listView = (ListView) findViewById(R.id.msgview);
@@ -121,10 +115,10 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        buttonEvents.setOnClickListener(new View.OnClickListener() {
+        buttonCreateEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), EventsActivity.class));
+                startActivity(new Intent(getApplicationContext(), CreateEventActivity.class));
             }
         });
 
@@ -146,6 +140,14 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), LeaveChatActivity.class));
+            }
+        });
+        buttonEvents.setOnClickListener(new View.OnClickListener(){
+
+
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), EventActivity.class));
             }
         });
 
