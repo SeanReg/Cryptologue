@@ -145,6 +145,26 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
     }
 
+    public void getMembers(final GotMembersListener listener) {
+        ParseQuery query = new ParseQuery("RoomLookup");
+        query.whereEqualTo("chatroom", mParseObj);
+        query.include("user");
+        query.findInBackground(new FindCallback<ParseObject>() {
+
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if(e != null) return;
+                mMembers.clear();
+                for(ParseObject room : objects) {
+                    ParseUser usr = (ParseUser) room.get("user");
+                    mMembers.add(new User(usr.getUsername(), usr.getString(AccountManager.FIELD_DISPLAY_NAME),
+                            usr.getString(AccountManager.FIELD_PHONE_NUMBER), usr));
+                }
+
+                if(listener != null) listener.onGotMembers(mMembers);
+            }
+        });
+    }
 /*    @Override
     public int describeContents() {
         return 0;
@@ -244,5 +264,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
     public interface BuiltListener {
         void onChatroomBuilt(Chatroom room);
+    }
+
+    public interface GotMembersListener {
+        void onGotMembers(List<User> members);
     }
 }

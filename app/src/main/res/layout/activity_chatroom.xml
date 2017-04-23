@@ -49,6 +49,12 @@
             android:text="Chatroom Name"/>
 
         <Button
+            android:id="@+id/chatfunctions_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Chat Functions"/>
+
+        <Button
             android:id="@+id/create_poll_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

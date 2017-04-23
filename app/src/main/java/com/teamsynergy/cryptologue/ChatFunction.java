@@ -19,6 +19,11 @@ public class ChatFunction {
 
     };
 
+    // test
+    public ChatFunction(String name) {
+        mName = name;
+    };
+
     public String getTimeRemaining() {
         long diff = mEndDate.getTime() - mStartDate.getTime();
         long diffSeconds = diff / 1000 % 60;
@@ -39,5 +44,9 @@ public class ChatFunction {
 
     public void participate(String decision) {
 
+    }
+
+    public String getName() {
+        return mName;
     }
 }

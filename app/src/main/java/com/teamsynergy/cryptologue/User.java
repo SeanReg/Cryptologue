@@ -4,11 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.parse.FindCallback;
+import com.parse.GetFileCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,6 +58,24 @@ public class User implements Parcelable {
 
     public String getPhoneNumber() { return mPhoneNumber; }
 
+
+    public void getImage(final PictureDownloadedListener listener) {
+        ParseFile avatar = mParseUser.getParseFile(AccountManager.FIELD_AVATAR);
+
+        if (avatar == null) {
+            listener.onGotProfilePicture(null);
+         return;
+        }
+
+        avatar.getFileInBackground(new GetFileCallback() {
+            @Override
+            public void done(File file, ParseException e) {
+                if (e != null) return;
+                listener.onGotProfilePicture(file);
+            }
+        });
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -92,6 +113,10 @@ public class User implements Parcelable {
             return getUsername().equals(usr);
         }
         return super.equals(usr);
+    }
+
+    public interface PictureDownloadedListener {
+        public void onGotProfilePicture(File image);
     }
 
     public interface UsersFoundListener {

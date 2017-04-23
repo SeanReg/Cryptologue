@@ -25,6 +25,7 @@ import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.ImageUtil;
 import com.teamsynergy.cryptologue.Manifest;
 import com.teamsynergy.cryptologue.R;
+import com.teamsynergy.cryptologue.User;
 import com.teamsynergy.cryptologue.UserAccount;
 
 import java.io.File;
@@ -80,7 +81,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
 
-        AccountManager.getInstance().getCurrentAccount().getImage(new UserAccount.Callbacks() {
+        AccountManager.getInstance().getCurrentAccount().getImage(new User.PictureDownloadedListener() {
             @Override
             public void onGotProfilePicture(File image) {
                 ImageView imgView = (ImageView) findViewById(R.id.userAvatar);

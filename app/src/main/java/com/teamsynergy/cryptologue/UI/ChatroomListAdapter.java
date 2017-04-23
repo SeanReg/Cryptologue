@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
@@ -59,7 +58,7 @@ public class ChatroomListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
-        View rowView = mInflater.inflate(R.layout.cardlayout, parent, false);
+        View rowView = mInflater.inflate(R.layout.cardlayout_chatroom, parent, false);
         TextView nameTextView = (TextView) rowView.findViewById(R.id.roomName);
         final ImageView imageView = (ImageView) rowView.findViewById(R.id.chatAvatar);
         final Chatroom room = (Chatroom) getItem(position);

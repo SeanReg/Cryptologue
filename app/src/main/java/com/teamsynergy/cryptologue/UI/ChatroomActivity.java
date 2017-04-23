@@ -16,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.teamsynergy.cryptologue.AccountManager;
+import com.teamsynergy.cryptologue.ChatFunction;
 import com.teamsynergy.cryptologue.ChatMessageBubble;
 import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.Message;
@@ -37,9 +39,14 @@ import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.ChatArrayAdapter;
+import com.teamsynergy.cryptologue.User;
 import com.teamsynergy.cryptologue.UserAccount;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.inputmethod.InputMethodManager;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -52,6 +59,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
 
     private Button buttonChatRoomName;
+    private Button buttonChatFunctions;
     private Button buttonCreatePoll;
     private Button buttonEvents;
     private Button buttonPolls;
@@ -65,6 +73,9 @@ public class ChatroomActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
 
+    private ArrayList<Pair<User, File>> mMembers = new ArrayList<>();
+    private Thread mMemberTrackerThread;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +85,7 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonSend = (Button) findViewById(R.id.send);
 
         buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
+        buttonChatFunctions = (Button) findViewById(R.id.chatfunctions_button);
         buttonCreatePoll = (Button) findViewById(R.id.create_poll_button);
         buttonEvents = (Button) findViewById(R.id.events_button);
         buttonPolls = (Button) findViewById(R.id.polls_button);
@@ -94,6 +106,24 @@ public class ChatroomActivity extends AppCompatActivity {
 
         chatArrayAdapter = new ChatArrayAdapter(getApplicationContext(), R.layout.right);
         listView.setAdapter(chatArrayAdapter);
+
+        mChatroom.getMembers(new Chatroom.GotMembersListener() {
+            @Override
+            public void onGotMembers(final List<User> members) {
+                for(final User member : members) {
+                    member.getImage(new User.PictureDownloadedListener() {
+                        @Override
+                        public void onGotProfilePicture(File image) {
+                            mMembers.add(new Pair<>(member, image));
+                            if(mMembers.size() == members.size()) {
+                                mChatroom.getCachedMessages(mMessageRecieved);
+                            }
+                        }
+                    });
+                }
+
+            }
+        });
 
         chatText = (EditText) findViewById(R.id.msg);
         chatText.setOnKeyListener(new View.OnKeyListener() {
@@ -116,6 +146,13 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), ChatRoomNameActivity.class));
+            }
+        });
+
+        buttonChatFunctions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
             }
         });
 
@@ -166,7 +203,6 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        mChatroom.getCachedMessages(mMessageRecieved);
         mChatroom.setMessageListener(mMessageRecieved);
     }
 
@@ -205,14 +241,30 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     private void sendChatMessage() {
-        String msg = chatText.getText().toString();
-        mChatroom.sendMessage(new Message(msg));
-        addChatMessage(msg, true);
+        String msgTxt = chatText.getText().toString();
+        Message msg = new Message(msgTxt);
+        msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
+        mChatroom.sendMessage(msg);
+        addChatMessage(msg);
         chatText.setText("");
     }
 
-    private void addChatMessage(String msg, boolean isSender) {
-        chatArrayAdapter.add(new ChatMessageBubble(isSender, msg));
+    private void addChatMessage(Message msg) {
+        UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
+        String curUsrId = curAcc.getParseUser().getObjectId();
+        File userImage = null;
+        String displayName = null;
+
+        for(Pair<User, File> member : mMembers) {
+            if(member.first.getParseUser().getObjectId().equals(msg.getSender())) {
+                userImage = member.second;
+                displayName = member.first.getDisplayName();
+                chatArrayAdapter.add(new ChatMessageBubble(curUsrId.equals(msg.getSender()), msg.getText(), userImage, displayName));
+                break;
+            }
+        }
+
+        //compare users from members array list and set picture
     }
 
     private void addToActionBar(final Menu menu) {
@@ -238,10 +290,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private final MessagingService.MessageListener mMessageRecieved = new MessagingService.MessageListener() {
         @Override
         public void onMessageRecieved(Message msg) {
-            UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
-            String curUsrId = curAcc.getParseUser().getObjectId();
-
-            addChatMessage(msg.getText(), curUsrId.equals(msg.getSender()));
+            addChatMessage(msg);
         }
     };
 

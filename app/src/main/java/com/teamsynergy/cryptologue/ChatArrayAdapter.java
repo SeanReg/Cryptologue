@@ -1,11 +1,14 @@
 package com.teamsynergy.cryptologue;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -15,6 +18,8 @@ import java.util.List;
 public class ChatArrayAdapter extends ArrayAdapter<ChatMessageBubble> {
 
     private TextView chatText;
+    private TextView displayNameText;
+    private ImageView userImage;
     private List<ChatMessageBubble> ChatMessageBubbleList = new ArrayList<ChatMessageBubble>();
     private Context context;
 
@@ -50,8 +55,17 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessageBubble> {
             } else {
                 object.mView = inflater.inflate(R.layout.left, parent, false);
             }
+
+            if(object.mUserImage != null) {
+                userImage = (ImageView) object.mView.findViewById(R.id.user_pic);
+                userImage.setImageURI(Uri.fromFile(object.mUserImage));
+            }
+
+            displayNameText = (TextView) object.mView.findViewById(R.id.displayname);
             chatText = (TextView) object.mView.findViewById(R.id.msgr);
+            displayNameText.setText(object.mUserDisplayName);
             chatText.setText(object.message);
+
         }
 
         return object.mView;

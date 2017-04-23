@@ -57,27 +57,8 @@ public class UserAccount extends User implements SecurityCheck {
         mIsValid = false;
     }
 
-    public void getImage(final UserAccount.Callbacks listener) {
-        ParseFile avatar = getParseUser().getParseFile(AccountManager.FIELD_AVATAR);
-
-        if (avatar == null)
-            return;
-
-        avatar.getFileInBackground(new GetFileCallback() {
-                @Override
-                public void done(File file, ParseException e) {
-                    if (e != null) return;
-                    listener.onGotProfilePicture(file);
-                }
-            });
-    }
-
     public static abstract class Callbacks {
         public void onGotChatrooms(List<Chatroom> rooms) {
-
-        }
-
-        public void onGotProfilePicture(File image) {
 
         }
     }
