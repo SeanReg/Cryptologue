@@ -53,6 +53,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Chat Functions"/>
+        <Button
+            android:id="@+id/events_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Events (#)"/>
 
         <Button
             android:id="@+id/create_poll_button"
@@ -61,10 +66,10 @@
             android:text="Create Poll"/>
 
         <Button
-            android:id="@+id/events_button"
+            android:id="@+id/create_events_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Events (#)"/>
+            android:text="Create Event"/>
 
         <Button
             android:id="@+id/polls_button"

@@ -17,13 +17,17 @@ import android.widget.ListView;
 
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.KeyManager;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ParseInit;
+import com.teamsynergy.cryptologue.Poll;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.UserAccount;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.KeyGenerator;
 
 import static android.app.PendingIntent.getActivity;
 
@@ -51,25 +55,29 @@ public class HomepageActivity extends AppCompatActivity {
 
         mListView = (ListView) findViewById(R.id.chatroom_list);
 
+        KeyManager manager = new KeyManager(KeyManager.KEY_TYPE_SYMMETRIC);
+        Log.d("Key", manager.getKeys().first.toString());
+
 
         mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList);
         mListView.setAdapter(mChatroomAdapter);
+        
+    }
+
+
+    public void onStart(){
+        super.onStart();
+
 
         if (AccountManager.getInstance().getCurrentAccount() == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivityForResult(intent, RESULT_LOGGED_IN);
         } else {
             updateChatrooms();
+
         }
-
-
-/*        Chatroom.Builder cB = new Chatroom.Builder();
-        cB.setName("Tetst");
-        cB.build(true);*/
-
-
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,6 +129,7 @@ public class HomepageActivity extends AppCompatActivity {
         curAcc.getChatrooms(new UserAccount.Callbacks() {
             @Override
             public void onGotChatrooms(List<Chatroom> rooms) {
+                mChatroomList.clear();
                 for (Chatroom room : rooms) {
                     //Log.d("Room", room.getName());
                     mChatroomList.add(room);

@@ -60,11 +60,12 @@ public class ChatroomActivity extends AppCompatActivity {
 
     private Button buttonChatRoomName;
     private Button buttonChatFunctions;
+    private Button buttonCreateEvent;
     private Button buttonCreatePoll;
-    private Button buttonEvents;
     private Button buttonPolls;
     private Button buttonMembers;
     private Button buttonLeaveChat;
+    private Button buttonEvents;
 
 
     private Chatroom mChatroom = null;
@@ -86,6 +87,7 @@ public class ChatroomActivity extends AppCompatActivity {
 
         buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
         buttonChatFunctions = (Button) findViewById(R.id.chatfunctions_button);
+        buttonCreateEvent = (Button) findViewById(R.id.create_events_button);
         buttonCreatePoll = (Button) findViewById(R.id.create_poll_button);
         buttonEvents = (Button) findViewById(R.id.events_button);
         buttonPolls = (Button) findViewById(R.id.polls_button);
@@ -163,10 +165,10 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        buttonEvents.setOnClickListener(new View.OnClickListener() {
+        buttonCreateEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), EventsActivity.class));
+                startActivity(new Intent(getApplicationContext(), CreateEventActivity.class));
             }
         });
 
@@ -188,6 +190,14 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), LeaveChatActivity.class));
+            }
+        });
+        buttonEvents.setOnClickListener(new View.OnClickListener(){
+
+
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), EventActivity.class));
             }
         });
 

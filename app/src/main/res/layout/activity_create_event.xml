@@ -98,17 +98,17 @@
 
 
     <fragment
+        android:hint="Place"
         android:id="@+id/place_autocomplete_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
         />
+
     <Button
-        android:id="@+id/googlemaps_button"
+        android:id="@+id/submit_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Google Maps"/>
-
-
+        android:text="Submit"/>
 </LinearLayout>
 </ScrollView>

@@ -5,35 +5,26 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.EditText;
 import java.util.Calendar;
 import android.widget.TimePicker;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.teamsynergy.cryptologue.Event;
 import com.teamsynergy.cryptologue.R;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by jasonpinlac on 4/11/17.
  */
 
-public class EventsActivity extends AppCompatActivity {
+public class CreateEventActivity extends AppCompatActivity {
     EditText mStartDate;
     EditText mEndDate;
     DatePickerDialog datePickerDialog;
@@ -41,13 +32,15 @@ public class EventsActivity extends AppCompatActivity {
     EditText mEndTime;
     Button buttonOpenGoogleMaps;
     EditText mDescription;
+    Button buttonSubmit;
+    Event event;
 
     private Place mSelectedPlace = null;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_events);
+        setContentView(R.layout.activity_create_event);
 
 
         mStartDate = (EditText) findViewById(R.id.start_date);
@@ -79,26 +72,28 @@ public class EventsActivity extends AppCompatActivity {
 
             }
         });
-        buttonOpenGoogleMaps= (Button) findViewById(R.id.googlemaps_button);
-        buttonOpenGoogleMaps.setOnClickListener(new View.OnClickListener(){
 
+        buttonSubmit = (Button) findViewById(R.id.submit_button);
+        buttonSubmit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if (mSelectedPlace == null)
-                    return;
-
-                Uri gmmIntentUri = Uri.parse("geo:" + mSelectedPlace.getLatLng().latitude + "," +
-                    mSelectedPlace.getLatLng().longitude + "?q=" + mSelectedPlace.getAddress().toString());
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(mapIntent);
+                mStartDate.getText();
+                mEndDate.getText();
+                mStartTime.getText();
+                mEndTime.getText();
+                mDescription.getText();
+                if(mSelectedPlace!=null) {
+                    mSelectedPlace.getAddress();
+                    mSelectedPlace.getLatLng();
+                    mSelectedPlace.getName();
                 }
-
+                finish();
             }
         });
 
     }
+
+
 
 
     private View.OnClickListener createDateListener() {
@@ -110,7 +105,7 @@ public class EventsActivity extends AppCompatActivity {
                 int mMonth = c.get(Calendar.MONTH); // current month
                 int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
                 // date picker dialog
-                datePickerDialog = new DatePickerDialog(EventsActivity.this,
+                datePickerDialog = new DatePickerDialog(CreateEventActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
 
                             @Override
@@ -136,7 +131,7 @@ public class EventsActivity extends AppCompatActivity {
                 view.clearFocus();
                 Calendar mcurrentTime = Calendar.getInstance();
                 TimePickerDialog mTimePicker;
-                mTimePicker = new TimePickerDialog(EventsActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                mTimePicker = new TimePickerDialog(CreateEventActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                         String mSelectedMinuteString=Integer.toString(selectedMinute);
