@@ -37,6 +37,7 @@ public class HomepageActivity extends AppCompatActivity {
 
     private ListView mListView;
     private ArrayList<Chatroom> mChatroomList = new ArrayList<>();
+    private ArrayList<String> mMessagePreviewList = new ArrayList<>();
 
     private ChatroomListAdapter mChatroomAdapter = null;
 
@@ -59,7 +60,7 @@ public class HomepageActivity extends AppCompatActivity {
         Log.d("Key", manager.getKeys().first.toString());
 
 
-        mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList);
+        mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList, mMessagePreviewList); //add the most recent message
         mListView.setAdapter(mChatroomAdapter);
 
     }
@@ -133,6 +134,7 @@ public class HomepageActivity extends AppCompatActivity {
                 for (Chatroom room : rooms) {
                     //Log.d("Room", room.getName());
                     mChatroomList.add(room);
+                    //add most recent message of chatroom to mMessagePreviewList
                 }
                 mListView.setAdapter(mChatroomAdapter);
             }
