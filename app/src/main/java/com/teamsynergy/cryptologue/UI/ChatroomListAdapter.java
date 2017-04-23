@@ -14,6 +14,8 @@ import android.widget.TextView;
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.Message;
+import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 
@@ -31,11 +33,13 @@ public class ChatroomListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private ArrayList<Chatroom> mDataSource;
     private HashMap<String, Bitmap> mDataBitmaps = new HashMap<>();
+    private ArrayList<String> mMessage;
 
 
-    public ChatroomListAdapter(Context context, ArrayList<Chatroom> rooms){
+    public ChatroomListAdapter(Context context, ArrayList<Chatroom> rooms, ArrayList<String> messages){
         mContext = context;
         mDataSource = rooms;
+        mMessage = messages;
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
@@ -60,9 +64,19 @@ public class ChatroomListAdapter extends BaseAdapter {
     public View getView(int position, View view, ViewGroup parent) {
         View rowView = mInflater.inflate(R.layout.cardlayout_chatroom, parent, false);
         TextView nameTextView = (TextView) rowView.findViewById(R.id.roomName);
+        final TextView messagePreview= (TextView) rowView.findViewById(R.id.messagePreview);
         final ImageView imageView = (ImageView) rowView.findViewById(R.id.chatAvatar);
         final Chatroom room = (Chatroom) getItem(position);
         final String name = room.getName();
+
+        room.getCachedMessages(new MessagingService.MessageListener() {
+            @Override
+            public void onMessageRecieved(Message s) {
+                String lastMessage = "";
+                lastMessage = s.getText();
+                messagePreview.setText(lastMessage);
+            }
+        });
         if (!mDataBitmaps.containsKey(room.getId())) {
             room.getImage(new GetDataCallback() {
                 @Override
@@ -81,6 +95,7 @@ public class ChatroomListAdapter extends BaseAdapter {
 
 
         nameTextView.setText(name);
+
 
         rowView.setOnClickListener(new View.OnClickListener() {
             @Override
