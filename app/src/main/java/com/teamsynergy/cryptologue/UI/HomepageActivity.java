@@ -17,13 +17,17 @@ import android.widget.ListView;
 
 import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.KeyManager;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ParseInit;
+import com.teamsynergy.cryptologue.Poll;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.UserAccount;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.KeyGenerator;
 
 import static android.app.PendingIntent.getActivity;
 
@@ -51,6 +55,9 @@ public class HomepageActivity extends AppCompatActivity {
 
         mListView = (ListView) findViewById(R.id.chatroom_list);
 
+        KeyManager manager = new KeyManager(KeyManager.KEY_TYPE_SYMMETRIC);
+        Log.d("Key", manager.getKeys().first.toString());
+
 
         mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList);
         mListView.setAdapter(mChatroomAdapter);
@@ -61,8 +68,6 @@ public class HomepageActivity extends AppCompatActivity {
         } else {
             updateChatrooms();
         }
-
-
 /*        Chatroom.Builder cB = new Chatroom.Builder();
         cB.setName("Tetst");
         cB.build(true);*/

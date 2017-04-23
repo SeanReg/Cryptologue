@@ -1,5 +1,7 @@
 package com.teamsynergy.cryptologue;
 
+import com.parse.ParseObject;
+
 import java.util.Date;
 
 /**
@@ -8,12 +10,14 @@ import java.util.Date;
 
 public class ChatFunction {
 
-    private Date mStartDate = null;
-    private Date mEndDate = null;
-    private String mName = "";
-    private String mDescritpion = "";
-    private User mCreator = null;
+    protected Date mStartDate = new Date();
+    protected Date mEndDate = new Date();
+    protected String mName = "";
+    protected String mDescritpion = "";
+    protected User mCreator = null;
     protected String mType = null;
+
+    protected ParseObject mParseObj = null;
 
     public ChatFunction() {
 
@@ -39,5 +43,37 @@ public class ChatFunction {
 
     public void participate(String decision) {
 
+    }
+
+    public static class Builder {
+        protected ChatFunction mCFunction;
+
+        public Builder() {
+            mCFunction = null;
+        }
+
+        public void setStartDate(Date date) {
+            if (mCFunction != null)
+                mCFunction.mStartDate = date;
+        }
+
+        public void setEndDate(Date date) {
+            if (mCFunction != null)
+                mCFunction.mEndDate = date;
+        }
+
+        public void setName(String name) {
+            if (mCFunction != null)
+                mCFunction.mName = name;
+        }
+
+        public void setDescription(String desc) {
+
+        }
+
+        public void setParseObject(ParseObject parseObject) {
+            if (mCFunction != null)
+                mCFunction.mParseObj = parseObject;
+        }
     }
 }
