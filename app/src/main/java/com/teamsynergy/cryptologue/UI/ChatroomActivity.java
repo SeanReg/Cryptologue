@@ -1,7 +1,7 @@
 package com.teamsynergy.cryptologue.UI;
 
-import android.app.ActionBar;
-import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
@@ -9,8 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,9 +24,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.parse.GetDataCallback;
 import com.parse.ParseException;
@@ -42,9 +41,6 @@ import com.teamsynergy.cryptologue.UserAccount;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.inputmethod.InputMethodManager;
 
-
-import static android.app.ActionBar.DISPLAY_SHOW_CUSTOM;
-
 public class ChatroomActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
 
@@ -56,10 +52,12 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
 
     private Button buttonChatRoomName;
-    private Button buttonEvents;
+    private Button buttonCreateEvent;
+    private Button buttonCreatePoll;
     private Button buttonPolls;
     private Button buttonMembers;
     private Button buttonLeaveChat;
+    private Button buttonEvents;
 
 
     private Chatroom mChatroom = null;
@@ -77,6 +75,8 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonSend = (Button) findViewById(R.id.send);
 
         buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
+        buttonCreateEvent = (Button) findViewById(R.id.create_events_button);
+        buttonCreatePoll = (Button) findViewById(R.id.create_poll_button);
         buttonEvents = (Button) findViewById(R.id.events_button);
         buttonPolls = (Button) findViewById(R.id.polls_button);
         buttonMembers = (Button) findViewById(R.id.members_button);
@@ -121,10 +121,17 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        buttonEvents.setOnClickListener(new View.OnClickListener() {
+        buttonCreatePoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), EventsActivity.class));
+                startActivity(new Intent(getApplicationContext(), CreatePollActivity.class));
+            }
+        });
+
+        buttonCreateEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), CreateEventActivity.class));
             }
         });
 
@@ -146,6 +153,14 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext(), LeaveChatActivity.class));
+            }
+        });
+        buttonEvents.setOnClickListener(new View.OnClickListener(){
+
+
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), EventActivity.class));
             }
         });
 
@@ -235,7 +250,7 @@ public class ChatroomActivity extends AppCompatActivity {
         public void onMessageRecieved(Message msg) {
             UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
             String curUsrId = curAcc.getParseUser().getObjectId();
-            
+
             addChatMessage(msg.getText(), curUsrId.equals(msg.getSender()));
         }
     };

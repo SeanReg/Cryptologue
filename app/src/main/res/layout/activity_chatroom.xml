@@ -21,7 +21,9 @@
             android:background="@null"
             android:divider="@null"
             android:stackFromBottom="true"
-            android:transcriptMode="alwaysScroll"></ListView>
+            android:transcriptMode="alwaysScroll">
+
+        </ListView>
 
         <include
             layout="@layout/message_area"
@@ -30,6 +32,7 @@
             android:gravity="bottom" />
 
     </LinearLayout>
+
 
     <!-- Side navigation drawer UI -->
     <LinearLayout
@@ -50,6 +53,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Events (#)"/>
+
+        <Button
+            android:id="@+id/create_poll_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Poll"/>
+
+        <Button
+            android:id="@+id/create_events_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Event"/>
 
         <Button
             android:id="@+id/polls_button"
