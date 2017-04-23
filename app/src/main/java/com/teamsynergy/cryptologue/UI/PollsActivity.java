@@ -20,9 +20,13 @@ import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.teamsynergy.cryptologue.ObjectPasser;
+import com.teamsynergy.cryptologue.Poll;
 import com.teamsynergy.cryptologue.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,15 +35,16 @@ import java.util.Map;
 
 public class PollsActivity extends AppCompatActivity{
     private LayoutInflater mInflater;
-    private LinearLayout[] optionsArray= new LinearLayout[4];
+    private ArrayList<Pair<LinearLayout, Poll.PollOption>> optionsArray = new ArrayList<>();
     private int mOptionSelected;
     private Button buttonSubmit;
+    private Poll mPoll;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_polls);
 
-        GraphView graph = (GraphView) findViewById(R.id.graph);
+        final GraphView graph = (GraphView) findViewById(R.id.graph);
         graph.getViewport().setScrollable(true);
 
         StaticLabelsFormatter staticLabelsFormatter = new StaticLabelsFormatter(graph);
@@ -47,40 +52,55 @@ public class PollsActivity extends AppCompatActivity{
         staticLabelsFormatter.setHorizontalLabels(new String[] {"A", "B", "C", "D"});
         graph.getGridLabelRenderer().setLabelFormatter(staticLabelsFormatter);
 
-        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(new DataPoint[] {
-                new DataPoint(1, 2),
-                new DataPoint(2, 6),
-                new DataPoint(3, 12),
-                new DataPoint(4, 12)
-        });
-        graph.addSeries(series);
-
-        series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
+        mPoll = (Poll)ObjectPasser.popObject("chatfunction");
+        mPoll.checkUserVoted(new Poll.UserVotedListener() {
             @Override
-            public int get(DataPoint data) {
-                return Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100);
+            public void onGotUserVoted(final boolean voted) {
+                mPoll.getPollOptions(new Poll.PollOptionsListener() {
+                    @Override
+                    public void onGotPollOptions(List<Poll.PollOption> options) {
+                        LinearLayout parent = (LinearLayout)findViewById(R.id.poll_result_layout);
+
+                        ArrayList<DataPoint> dataPoints = new ArrayList<DataPoint>();
+                        for(int i = 0; i < options.size(); ++i) {
+                            LinearLayout optionLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.poll_option, null);
+                            ((TextView)optionLayout.findViewById(R.id.option_texts)).setText(options.get(i).getDescription());
+                            if (voted)
+                                ((CheckBox)optionLayout.findViewById(R.id.option)).setVisibility(View.GONE);
+                            parent.addView(optionLayout);
+                            optionsArray.add(new Pair<LinearLayout, Poll.PollOption>(optionLayout, options.get(i)));
+                            dataPoints.add(new DataPoint(i, options.get(i).getVotes()));
+                        }
+
+                        BarGraphSeries<DataPoint> series = new BarGraphSeries<>(dataPoints.toArray(new DataPoint[dataPoints.size()]));
+                        graph.addSeries(series);
+
+                        series.setValueDependentColor(new ValueDependentColor<DataPoint>() {
+                            @Override
+                            public int get(DataPoint data) {
+                                return Color.rgb((int) data.getX()*255/4, (int) Math.abs(data.getY()*255/6), 100);
+                            }
+                        });
+
+                        series.setSpacing(30);
+
+                        series.setDrawValuesOnTop(true);
+                        series.setValuesOnTopColor(Color.WHITE);
+                    }
+                });
             }
         });
 
-        series.setSpacing(30);
-
-        series.setDrawValuesOnTop(true);
-        series.setValuesOnTopColor(Color.WHITE);
 
 
-        LinearLayout parent = (LinearLayout)findViewById(R.id.poll_result_layout);
-        for(int i = 0; i < 4; ++i) {
-            LinearLayout optionLayout = (LinearLayout) getLayoutInflater().inflate(R.layout.poll_option, null);
-            ((TextView)optionLayout.findViewById(R.id.option_texts)).setText("testing " + i);
-            parent.addView(optionLayout);
-            optionsArray[i]=optionLayout;
-        }
+
 
         buttonSubmit = (Button) findViewById(R.id.submit_button);
         buttonSubmit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                // mOptionSelected    //this is the selected option
+                mPoll.voteOn(optionsArray.get(mOptionSelected).second);
                 finish();
             }
         });
@@ -95,12 +115,12 @@ public class PollsActivity extends AppCompatActivity{
             return;
         View parent= (View) view.getParent();
 
-        for(int i=0; i <optionsArray.length; ++i){
-            if(parent == optionsArray[i]){
-                mOptionSelected=i+1;
+        for(int i=0; i <optionsArray.size(); ++i){
+            if(parent == optionsArray.get(i).first){
+                mOptionSelected=i;
             }
             else{
-                CheckBox checkBox = (CheckBox)optionsArray[i].findViewById(R.id.option);
+                CheckBox checkBox = (CheckBox)optionsArray.get(i).first.findViewById(R.id.option);
                 checkBox.setChecked(false);
             }
 
