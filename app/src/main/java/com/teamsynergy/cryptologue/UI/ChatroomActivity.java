@@ -59,6 +59,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private Button buttonSend;
     private Toolbar toolbar;
     private boolean side = false;
+    private String tag;
 
     private Button buttonChatRoomName;
     private Button buttonCreateEvent;
@@ -258,6 +259,17 @@ public class ChatroomActivity extends AppCompatActivity {
         String msgTxt = chatText.getText().toString();
         Message msg = new Message(msgTxt);
         msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
+        if(msgTxt.contains("@")) {
+            String text = msgTxt.toLowerCase();
+            for (int i = 0; i < mMembers.size(); ++i) {     //loops thru members of chatroom and see if their display name was in the string
+                if (text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase()) != -1) {
+                    if (text.indexOf("@") == text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase()) - 1) {
+                        msg.setTag(mMembers.get(i).first);
+                        break;
+                    }
+                }
+            }
+        }
         mChatroom.sendMessage(msg);
         addChatMessage(msg);
         chatText.setText("");
