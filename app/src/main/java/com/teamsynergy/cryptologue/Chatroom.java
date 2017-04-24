@@ -26,21 +26,49 @@ import java.util.List;
  * Created by Sean on 3/29/2017.
  */
 
+/**
+ * Class that represents a a Chatroom
+ */
 public class Chatroom implements SecurityCheck { //, Parcelable {
+    /**
+     * Chatroom's name
+     */
     private String mName = "";
+
+    /**
+     * Chatroom database object
+     */
     private ParseObject mParseObj = null;
+
+    /**
+     * Chatroom database file object
+     */
     private ParseFile mImage = null;
+
+    /**
+     * Chatroom list of members
+     */
     private ArrayList<User> mMembers = new ArrayList<>();
 
-
+    /**
+     * Chatroom default constructor
+     */
     private Chatroom() {
 
     }
 
+    /**
+     * Accessor for Chatroom name
+     * @return Chatroom name
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * Accessor for downloading an image from the database
+     * @param listener notifies that the image is ready
+     */
     public void getImage(GetDataCallback listener) {
         if (mParseObj.getParseFile("icon") == null)
             return;
@@ -48,6 +76,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         mParseObj.getParseFile("icon").getDataInBackground(listener);
     }
 
+    /**
+     * Sends a message to another user
+     * @param msg Message object to be sent
+     */
     public void sendMessage(Message msg) {
         msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
 
@@ -56,6 +88,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
     }
 
+    /**
+     * Sets the call back for the messenger
+     * @param listener notifies that a message has been received
+     */
     public void setMessageListener(final MessagingService.MessageListener listener) {
         MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
             @Override
@@ -67,6 +103,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         });
     }
 
+    /**
+     * Locally stores messages a user has received
+     * @param msg Message object to cache
+     */
     private void cacheMessage(Message msg) {
         ParseObject msgObject = new ParseObject("Messages");
         msgObject.put("userId", msg.getSender());
@@ -75,6 +115,11 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         msgObject.pinInBackground();
     }
 
+    /**
+     * Accessor that retrieves caches messages
+     * @param listener
+     * @param limit
+     */
     public void getCachedMessages(final MessagingService.MessageListener listener, Integer limit) {
         ParseQuery query = new ParseQuery("Messages");
         query.orderByAscending("createdAt");
