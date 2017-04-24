@@ -23,6 +23,7 @@ public class ChatFunctionActivity extends AppCompatActivity {
     private ListView mListView;
     private static ArrayList<ChatFunction> mChatFunctionList = new ArrayList<>();
     private static ChatFunctionActivity mInstance = null;
+    private static Class mOpenActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,12 +33,16 @@ public class ChatFunctionActivity extends AppCompatActivity {
         mInstance = this;
 
         mListView = (ListView) findViewById(R.id.chatfunctions_list);
-        mChatFunctionAdapter = new ChatFunctionAdapter(this, mChatFunctionList, PollsActivity.class);
+        mChatFunctionAdapter = new ChatFunctionAdapter(this, mChatFunctionList, mOpenActivity);
         mListView.setAdapter(mChatFunctionAdapter);
     }
 
     public static Chatroom.GotChatFunctionsListener chatFunctionsListener() {
         return mChatFunctionsListener;
+    }
+
+    public static void setOpenActivity(Class activity) {
+        mOpenActivity = activity;
     }
 
     private static final Chatroom.GotChatFunctionsListener mChatFunctionsListener = new Chatroom.GotChatFunctionsListener() {

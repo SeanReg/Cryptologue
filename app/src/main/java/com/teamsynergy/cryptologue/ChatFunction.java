@@ -105,6 +105,17 @@ public class ChatFunction {
         return mName;
     }
 
+    public String getDescritpion() {
+        return mDescritpion;
+    }
+
+    public Date getStart() {
+        return mStartDate;
+    }
+
+    public Date getEnd() {
+        return mEndDate;
+    }
     /**
      * Class that constructs a ChatFunction using the appropriate parameters
      */
@@ -154,7 +165,8 @@ public class ChatFunction {
          * @param desc  description
          */
         public void setDescription(String desc) {
-
+            if (mCFunction != null)
+                mCFunction.mDescritpion = desc;
         }
 
         /**

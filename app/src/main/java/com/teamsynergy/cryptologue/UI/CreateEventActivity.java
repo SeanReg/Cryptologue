@@ -17,7 +17,9 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.teamsynergy.cryptologue.Chatroom;
 import com.teamsynergy.cryptologue.Event;
+import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 
 /**
@@ -34,6 +36,7 @@ public class CreateEventActivity extends AppCompatActivity {
     EditText mDescription;
     Button buttonSubmit;
     Event event;
+    EditText mName;
 
     private Place mSelectedPlace = null;
 
@@ -48,6 +51,7 @@ public class CreateEventActivity extends AppCompatActivity {
         mEndDate=(EditText) findViewById(R.id.end_date);
         mEndDate.setOnClickListener(createDateListener());
         mDescription= (EditText) findViewById(R.id.description);
+        mName = (EditText) findViewById(R.id.event_name);
 
 
         mStartTime = (EditText) findViewById(R.id.start_time);
@@ -77,16 +81,19 @@ public class CreateEventActivity extends AppCompatActivity {
         buttonSubmit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                mStartDate.getText();
-                mEndDate.getText();
-                mStartTime.getText();
-                mEndTime.getText();
-                mDescription.getText();
-                if(mSelectedPlace!=null) {
-                    mSelectedPlace.getAddress();
-                    mSelectedPlace.getLatLng();
-                    mSelectedPlace.getName();
+                Event.Builder builder = new Event.Builder();
+                //builder.setStartDate(mStartDate.getText());
+                //builder.setStartDate(mEndDate.getText());
+                //mStartTime.getText();
+                //mEndTime.getText();
+                builder.setDescription(mDescription.getText().toString());
+                builder.setName(mName.getText().toString());
+                if(mSelectedPlace != null) {
+                    builder.setAddress(mSelectedPlace.getAddress().toString());
+                    //mSelectedPlace.getLatLng();
+                    //mSelectedPlace.getName();
                 }
+                builder.build(true, (Chatroom)(ObjectPasser.popObject("chatroomEvent")));
                 finish();
             }
         });

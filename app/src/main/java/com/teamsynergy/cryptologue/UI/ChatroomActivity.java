@@ -34,6 +34,7 @@ import com.teamsynergy.cryptologue.AccountManager;
 import com.teamsynergy.cryptologue.ChatFunction;
 import com.teamsynergy.cryptologue.ChatMessageBubble;
 import com.teamsynergy.cryptologue.Chatroom;
+import com.teamsynergy.cryptologue.Event;
 import com.teamsynergy.cryptologue.Message;
 import com.teamsynergy.cryptologue.MessagingService;
 import com.teamsynergy.cryptologue.ObjectPasser;
@@ -58,6 +59,7 @@ public class ChatroomActivity extends AppCompatActivity {
     private Button buttonSend;
     private Toolbar toolbar;
     private boolean side = false;
+    private String tag;
 
     private Button buttonChatRoomName;
     private Button buttonCreateEvent;
@@ -161,6 +163,7 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonCreateEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ObjectPasser.putObject("chatroomEvent", mChatroom);
                 startActivity(new Intent(getApplicationContext(), CreateEventActivity.class));
             }
         });
@@ -169,7 +172,7 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mChatroom.getChatFunctions(Poll.class, ChatFunctionActivity.chatFunctionsListener());
-
+                ChatFunctionActivity.setOpenActivity(PollsActivity.class);
                 startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
             }
         });
@@ -195,11 +198,11 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
         buttonEvents.setOnClickListener(new View.OnClickListener(){
-
-
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), EventActivity.class));
+                mChatroom.getChatFunctions(Event.class, ChatFunctionActivity.chatFunctionsListener());
+                ChatFunctionActivity.setOpenActivity(EventActivity.class);
+                startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
             }
         });
 
@@ -256,6 +259,17 @@ public class ChatroomActivity extends AppCompatActivity {
         String msgTxt = chatText.getText().toString();
         Message msg = new Message(msgTxt);
         msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
+        if(msgTxt.contains("@")) {
+            String text = msgTxt.toLowerCase();
+            for (int i = 0; i < mMembers.size(); ++i) {     //loops thru members of chatroom and see if their display name was in the string
+                if (text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase()) != -1) {
+                    if (text.indexOf("@") == text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase()) - 1) {
+                        msg.setTag(mMembers.get(i).first);
+                        break;
+                    }
+                }
+            }
+        }
         mChatroom.sendMessage(msg);
         addChatMessage(msg);
         chatText.setText("");

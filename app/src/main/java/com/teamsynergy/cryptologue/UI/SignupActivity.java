@@ -111,7 +111,7 @@ public class SignupActivity extends AppCompatActivity {
             _nameText.setError(null);
         }
 
-        if (phone == null || phone.length() != 10 || phone.isEmpty()) {
+        if (phone == null) {
             _phoneNumberText.setError("invalid phone number");
             valid = false;
         } else {

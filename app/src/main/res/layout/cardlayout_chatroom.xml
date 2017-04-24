@@ -33,7 +33,7 @@
             android:padding = "8dp"
             android:ellipsize="marquee"
             android:singleLine="true"
-       
+
             android:textSize="20sp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true" />

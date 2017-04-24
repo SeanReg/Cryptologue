@@ -9,6 +9,7 @@ import java.io.File;
 public class Message {
     private String mMsgText = "";
     private String mSender = "";
+    private User mTag;
 
     public Message() {
 
@@ -41,4 +42,14 @@ public class Message {
     public File getAttachment() {
         return null;
     }
+
+    public void setTag(User tag){
+        mTag=tag;
+    }
+
+    public User getTag(){
+        return mTag;
+    }
+
+
 }
