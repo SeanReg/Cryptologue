@@ -49,10 +49,18 @@ public class MessagingService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * Gets the singleton instance of the MessagingService
+     * @return the instance of the MessagingService
+     */
     public static MessagingService getInstance() {
         return mServiceInstance;
     }
 
+    /**
+     * Connects the application to the server socket
+     * @throws WebSocketException thrown when a connection cannot be made to the server
+     */
     public void connectSocket() throws WebSocketException {
         ParseInit.start(this);
 
@@ -60,10 +68,11 @@ public class MessagingService extends Service {
         if (mCurAccount == null)
             throw new WebSocketException("No current account!");
 
+        //Connect to the server
         mSocket = new WebSocketConnection();
-
         URI server = null;
         try {
+            //The server location
              server = new URI("ws://ec2-52-33-81-186.us-west-2.compute.amazonaws.com:8080");
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -76,16 +85,24 @@ public class MessagingService extends Service {
         mMessageListener = listener;
     }
 
+    /**
+     * Sends a message to the server through a Websocket
+     * @param msg the message to send to the sever
+     * @param chatroomId the Chatroom associated with the message
+     */
     public void socketSendMessage(String msg, String chatroomId) {
         try {
+            //Check if connected
             checkConnection();
 
+            //Send as JSON object
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("mType", MESSAGE_TYPE_SEND_CHAT);
                 jsonObject.put("chatroomId", chatroomId);
                 jsonObject.put("msg", msg);
 
+                //Send message
                 mSocket.sendTextMessage(jsonObject.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -95,13 +112,18 @@ public class MessagingService extends Service {
         }
     }
 
-
+    /**
+     * Notify the server of the user identity
+     * @throws WebSocketClosedException Thrown when the Websocket is unexpectedly closed
+     */
     private void socketIdentify() throws WebSocketClosedException {
         checkConnection();
 
+        //Create JSON object
         AccountManager accountManager = AccountManager.getInstance();
         JSONObject jsonObject = new JSONObject();
         try {
+            //Set message type, identitfy and send message
             jsonObject.put("mType", MESSAGE_TYPE_IDENTIFY);
             jsonObject.put("clientId", accountManager.getCurrentAccount().getParseUser().getObjectId());
             mSocket.sendTextMessage(jsonObject.toString());
@@ -110,11 +132,18 @@ public class MessagingService extends Service {
         }
     }
 
+    /**
+     * Checks if the Websocket is connected or not
+     * @throws WebSocketClosedException thrown if the Websocket is not connected
+     */
     private void checkConnection() throws WebSocketClosedException {
         if (mSocket == null || !mSocket.isConnected())
             throw new WebSocketClosedException("WebSocket not connected!");
     }
 
+    /**
+     * Exception for when the Websocket is closed
+     */
     private class WebSocketClosedException extends WebSocketException {
         public WebSocketClosedException(String message) {
             super(message);
@@ -128,6 +157,9 @@ public class MessagingService extends Service {
         return null;
     }
 
+    /**
+     * Callback listener for incoming WebSocket messages
+     */
     private final WebSocket.WebSocketConnectionObserver mSocketObserver = new WebSocket.WebSocketConnectionObserver() {
         @Override
         public void onOpen() {
@@ -148,8 +180,8 @@ public class MessagingService extends Service {
         public void onTextMessage(String s) {
             if (mMessageListener != null) {
                 try {
+                    //Decodes the message and forwards it to the listener
                     JSONObject j = new JSONObject(s);
-
                     Message msg = new Message(j.getString("msg"));
                     msg.setSender(j.getString("senderId"));
                     mMessageListener.onMessageRecieved(msg);

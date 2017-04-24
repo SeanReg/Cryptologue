@@ -199,6 +199,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     }
 
 
+    /**
+     * Gets the unique chatroom id
+     * @return a String containing a unique ID for the chatroom
+     */
     public String getId() {
         return mParseObj.getObjectId();
     }
@@ -208,6 +212,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
     }
 
+    /**
+     * Queries the database for the list of members in the chatroom
+     * @param listener the callback listener to notify when the member list has been queried
+     */
     public void getMembers(final GotMembersListener listener) {
         ParseQuery query = new ParseQuery("RoomLookup");
         query.whereEqualTo("chatroom", mParseObj);
@@ -219,6 +227,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 if(e != null) return;
                 mMembers.clear();
                 for(ParseObject room : objects) {
+                    //Convert each parse object to a user object
                     ParseUser usr = (ParseUser) room.get("user");
                     mMembers.add(new User(usr.getUsername(), usr.getString(AccountManager.FIELD_DISPLAY_NAME),
                             usr.getString(AccountManager.FIELD_PHONE_NUMBER), usr));
@@ -229,6 +238,11 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         });
     }
 
+    /**
+     * Queries the chatroom for a list of Chatfunctions of a certain type
+     * @param funcClass the type of ChatFuntions to retrieve
+     * @param listener the callback listener to notify when ChatFunctions have been queried
+     */
     public void getChatFunctions(final Class<? extends ChatFunction> funcClass, final GotChatFunctionsListener listener) {
         String dbName = (funcClass.getSimpleName() + "s").toLowerCase();
         ParseQuery query = mParseObj.getRelation(dbName).getQuery();
@@ -239,6 +253,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                     return;
 
                 try {
+                    //Use reflections to call a specific ChatFunction method
                     Class[] classes = funcClass.getDeclaredClasses();
                     Class builderC = null;
                     for (Class c : classes) {
@@ -247,6 +262,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                             break;
                         }
                     }
+                    //Build the ChatFunction from the ParseObject
                     Method build = builderC.getMethod("buildFromParseObjects",
                             new Class[]{ArrayList.class, Chatroom.class});
                     ArrayList<ChatFunction> functions = (ArrayList<ChatFunction>)build.invoke(null, objects, Chatroom.this);
@@ -358,14 +374,23 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         }
     }
 
+    /*
+    Callback listener
+     */
     public interface BuiltListener {
         void onChatroomBuilt(Chatroom room);
     }
 
+    /*
+    Callback listener
+     */
     public interface GotMembersListener {
         void onGotMembers(List<User> members);
     }
 
+    /*
+    Callback listener
+    */
     public interface GotChatFunctionsListener {
         void onGotChatFuntions(List<ChatFunction> functions);
     }

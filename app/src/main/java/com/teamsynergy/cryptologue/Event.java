@@ -23,10 +23,11 @@ public class Event extends ChatFunction {
     public Event() {
 
     }
-    public void participate(String decision) {
-        // going or not going
-    }
 
+    /**
+     * Gets the address of the event
+     * @return a String containing the Event location
+     */
     public String getAddress() {
         return mLocationAddress;
     }
@@ -38,13 +39,24 @@ public class Event extends ChatFunction {
             mCFunction = mEvent = new Event();
         }
 
+        /**
+         * Sets the address for the event
+         * @param address the address of the event
+         */
         public void setAddress(String address) {
             if (mCFunction != null)
                 mEvent.mLocationAddress = address;
         }
 
+        /**
+         * Builds and uploads a new Event
+         * @param isNew if true a new Event is created in the database
+         * @param chatroom the Chatroom object associated with the Event
+         * @return the newly built Event
+         */
         public Event build(boolean isNew, final Chatroom chatroom) {
             if (isNew) {
+                //Add Parse details
                 final ParseObject event = new ParseObject("Events");
                 event.put("name", mCFunction.mName);
                 event.put("startDate", mCFunction.mStartDate);
@@ -52,6 +64,7 @@ public class Event extends ChatFunction {
                 event.put("description", mCFunction.mDescritpion);
                 event.put("address", mEvent.mLocationAddress);
 
+                //Save to database
                 event.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -69,6 +82,12 @@ public class Event extends ChatFunction {
             return mEvent;
         }
 
+        /**
+         * Builds a list of Events from an array of ParseObjects
+         * @param objects a List of ParseObjects to reference
+         * @param room the room associated with the event
+         * @return a list of newly built Events
+         */
         public static ArrayList<Event> buildFromParseObjects(ArrayList<ParseObject> objects, Chatroom room) {
             UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
             ArrayList<Event> events = new ArrayList<>();
