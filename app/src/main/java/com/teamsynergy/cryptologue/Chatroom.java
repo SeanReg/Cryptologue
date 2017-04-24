@@ -77,7 +77,10 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
     public void getCachedMessages(final MessagingService.MessageListener listener, Integer limit) {
         ParseQuery query = new ParseQuery("Messages");
-        query.orderByAscending("createdAt");
+        if (limit == null || limit == 0)
+            query.orderByAscending("createdAt");
+        else
+            query.orderByDescending("createdAt");
         query.whereEqualTo("chatroomId", mParseObj.getObjectId());
         if (limit != null) query.setLimit(limit);
         query.fromLocalDatastore();

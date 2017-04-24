@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.teamsynergy.cryptologue.Event;
+import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 
 /**
@@ -25,23 +27,26 @@ public class EventActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
+        Event event = (Event)ObjectPasser.popObject("chatfunction");
         startDate = (TextView)findViewById(R.id.start_date);
-        startDate.setText("Start Date:");
+        startDate.setText("Start Date: " + event.getStart().toString());
 
         endDate = (TextView)findViewById(R.id.end_date);
-        endDate.setText("End Date:");
+        endDate.setText("End Date:" + event.getEnd().toString());
 
         startTime = (TextView)findViewById(R.id.start_time);
         startTime.setText("Start Time:");
+        startTime.setVisibility(View.GONE);
 
         endTime = (TextView)findViewById(R.id.end_time);
         endTime.setText("End Time:");
+        endTime.setVisibility(View.GONE);
 
         description = (TextView)findViewById(R.id.description);
-        description.setText("Description :");
+        description.setText("Description : " + event.getDescritpion());
 
         locationName = (TextView)findViewById(R.id.location);
-        locationName.setText("Location :");
+        locationName.setText("Location : " + event.getAddress());
         locationName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
