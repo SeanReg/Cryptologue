@@ -116,9 +116,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     }
 
     /**
-     * Accessor that retrieves caches messages
-     * @param listener
-     * @param limit
+     * Accessor that retrieves cached messages
+     * @param listener MessagingService listener
+     * @param limit Limit
      */
     public void getCachedMessages(final MessagingService.MessageListener listener, Integer limit) {
         ParseQuery query = new ParseQuery("Messages");
@@ -138,10 +138,18 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         });
     }
 
+    /**
+     * Invites a single user to a chatroom
+     * @param inv User
+     */
     public void inviteUser(User inv) {
         inviteUsers(Arrays.asList(inv));
     }
 
+    /**
+     * Invites multiple users to a chatroom
+     * @param inv List of users
+     */
     public void inviteUsers(List<User> inv) {
         ArrayList<ParseObject> invObjs = new ArrayList<>();
         for (int i = 0; i < inv.size(); ++i) {
@@ -161,6 +169,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         ParseObject.saveAllInBackground(invObjs);
     }
 
+    /**
+     * Nested class for managing database saving chatroom details
+     */
     private static class ChatroomSaved implements SaveCallback {
         private final BuiltListener mBuiltListener;
         private final Chatroom mChatroom;
@@ -244,25 +255,51 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         });
     }
 
+    /**
+     * Class that represents a chatroom Builder object
+     */
     public static class Builder {
+        /**
+         * Chatroom object
+         */
         private Chatroom mChatroom = new Chatroom();
+
+        /**
+         * Boolean flag for building a chatroom
+         */
         private boolean mIsBuilt = false;
 
+        /**
+         * Sets name to the chatroom object
+         * @param name String
+         */
         public void setName(String name) {
             if (!mIsBuilt)
                 mChatroom.mName = name;
         }
 
+        /**
+         * Sets the ParseObject to the chatroom object.
+         * @param parseObj ParseObject
+         */
         public void setParseObj(ParseObject parseObj) {
             if (!mIsBuilt)
                 mChatroom.mParseObj = parseObj;
         }
 
+        /**
+         * Sets the image file to the chatroom object.
+         * @param image File
+         */
         public void setImage(File image) {
             if (!mIsBuilt)
                 mChatroom.mImage = new ParseFile(image);
         }
 
+        /**
+         * Adds a member to the chatroom object.
+         * @param member User
+         */
         public void addMember(User member) {
             if (!mIsBuilt) {
                 for (User usr : mChatroom.mMembers) {
@@ -273,6 +310,12 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             }
         }
 
+        /**
+         * Build a chatroom
+         * @param isNew flag for communicating with the database
+         * @param listener handles the callback for a built chatroom
+         * @return chatroom object
+         */
         public Chatroom build(boolean isNew, final BuiltListener listener) {
             if (isNew && !mIsBuilt) {
                 final UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
