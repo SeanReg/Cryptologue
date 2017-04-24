@@ -20,23 +20,42 @@ import java.util.Objects;
  * Created by jasonpinlac on 3/26/17.
  */
 
+/**
+ * Class representing a User
+ */
 public class User implements Parcelable {
+
     private   String    mUsername     = "";
     private   String    mDisplayName  = "";
     private   String    mPhoneNumber  = "";
     protected ParseUser mParseUser    = null;
 
-
+    /**
+     * Default Constructor for a User object
+     */
     public User(){
 
     }
 
+    /**
+     * Constructor for a User object
+     * @param username String
+     * @param displayName String
+     * @param phonenumber String
+     */
     public User(String username, String displayName, String phonenumber) {
         mDisplayName = displayName;
         mUsername    = username;
         mPhoneNumber = phonenumber;
     }
 
+    /**
+     * Constructor for a User object
+     * @param username String
+     * @param displayName String
+     * @param phonenumber String
+     * @param parseUser Database object
+     */
     public User(String username, String displayName, String phonenumber, ParseUser parseUser) {
         mDisplayName = displayName;
         mUsername    = username;
@@ -44,21 +63,40 @@ public class User implements Parcelable {
         mParseUser   = parseUser;
     }
 
+    /**
+     * Accessor for User username
+     * @return String username
+     */
     public String getUsername() {
         return mUsername;
     }
 
+    /**
+     * Accessor for User displayName
+     * @return String displayName
+     */
     public String getDisplayName() {
         return mDisplayName;
     }
 
+    /**
+     * Accessor for User parseUser
+     * @return ParseUser parseUser
+     */
     public ParseUser getParseUser() {
         return mParseUser;
     }
 
+    /**
+     * Accessor for User phoneNumber
+     * @return String phoneNumber
+     */
     public String getPhoneNumber() { return mPhoneNumber; }
 
-
+    /**
+     * Accessor for getting a picture
+     * @param listener handles the callback for getting a picture
+     */
     public void getImage(final PictureDownloadedListener listener) {
         ParseFile avatar = mParseUser.getParseFile(AccountManager.FIELD_AVATAR);
 
@@ -75,6 +113,7 @@ public class User implements Parcelable {
             }
         });
     }
+
 
     @Override
     public int describeContents() {
@@ -123,6 +162,11 @@ public class User implements Parcelable {
         public void onUsersFound(List<User> users);
     }
 
+    /**
+     * Finds a list of User by their phone number.
+     * @param numbers List of String phone numbers
+     * @param listener Handles the callback after finding the Users
+     */
     public static void findByPhoneNumber(List<String> numbers, final UsersFoundListener listener) {
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereContainedIn(AccountManager.FIELD_PHONE_NUMBER, numbers);
