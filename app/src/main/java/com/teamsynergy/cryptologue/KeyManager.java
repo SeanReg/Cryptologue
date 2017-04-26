@@ -1,81 +1,111 @@
 package com.teamsynergy.cryptologue;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.security.KeyPairGeneratorSpec;
+import android.security.keystore.KeyProperties;
 import android.util.Pair;
 
+import com.parse.ParseException;
+
+import java.math.BigInteger;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Calendar;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * Created by Sean on 4/21/2017.
  */
 
 public class KeyManager {
-    private static final String KEY_ALGORITHM = "RSA";
-    private static final int    KEY_SIZE = 2048;
+    private KeyPair  mKeyPair  = null;
+    private KeyStore mKeyStore = null;
 
-    public static final int KEY_TYPE_SYMMETRIC  = 0;
-    public static final int KEY_TYPE_ASYMMETRIC = 1;
+    private final String mAlias;
 
-    private KeyPairGenerator mKeyPairGen  = null;
-    private KeyGenerator     mKeyGen  = null;
-    private KeyPair          mKeyPair = null;
+    public KeyManager(Context context, String alias) throws KeyGenerationException {
+        mAlias = alias;
 
-    SecretKey mSymmetricKey = null;
+        //Generate an RSA key pair
+        try {
+            mKeyStore = KeyStore.getInstance("AndroidKeyStore");
+            mKeyStore.load(null);
+            // Generate the RSA key pairs
+            if (!mKeyStore.containsAlias(alias)) {
+                // Generate a key pair for encryption
+                Calendar start = Calendar.getInstance();
+                Calendar end = Calendar.getInstance();
+                end.add(Calendar.YEAR, 30);
+                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)
+                        .setAlias(alias)
+                        .setSubject(new X500Principal("CN=" + alias))
+                        .setSerialNumber(BigInteger.TEN)
+                        .setStartDate(start.getTime())
+                        .setEndDate(end.getTime())
+                        .build();
 
-    public KeyManager(int keyType) {
-        generateKey(keyType);
-    }
+                KeyPairGenerator kpg = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
+                kpg.initialize(spec);
 
-    public KeyManager(String alias) {
-
-    }
-
-    private void generateKey(int keyType)  {
-        switch (keyType) {
-            case KEY_TYPE_ASYMMETRIC:
-                try {
-                    mKeyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
-                    mKeyPairGen.initialize(KEY_SIZE);
-                    mKeyPair = mKeyPairGen.genKeyPair();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case KEY_TYPE_SYMMETRIC:
-                try {
-                    mKeyGen = KeyGenerator.getInstance("AES");
-                    mKeyGen.init(128);
-                    mSymmetricKey = mKeyGen.generateKey();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
-
-                break;
+                mKeyPair = kpg.generateKeyPair();
+            } else {
+                KeyStore.PrivateKeyEntry entry = ((KeyStore.PrivateKeyEntry)mKeyStore.getEntry(alias, null));
+                mKeyPair = new KeyPair(entry.getCertificate().getPublicKey(), entry.getPrivateKey());
+            }
+        } catch(Exception e) {
+            throw new KeyGenerationException(e.getMessage(), e.getCause());
         }
     }
 
-    public Pair<Byte[], Byte[]> getKeys() {
-        if (mKeyPair != null) {
-            return new Pair<>(byteArrToByteArr(mKeyPair.getPublic().getEncoded()), byteArrToByteArr(mKeyPair.getPrivate().getEncoded()));
-        } else {
-            return new Pair<>(byteArrToByteArr(mSymmetricKey.getEncoded()), null);
+    public PublicKey getPublicKey() {
+        return mKeyPair.getPublic();
+    }
+
+    public PrivateKey getPrivateKey() {
+        return mKeyPair.getPrivate();
+    }
+
+    public void destroyKey() throws KeyGenerationException {
+        try {
+            mKeyStore.deleteEntry(mAlias);
+        } catch (KeyStoreException e) {
+            throw new KeyGenerationException(e.getMessage(), e.getCause());
         }
     }
 
-    public void storeKeys(String alias) {
-
-    }
-
-    private static Byte[] byteArrToByteArr(byte[] byteArr) {
-        Byte[] bObjs = new Byte[byteArr.length];
-        for (int i = 0; i < byteArr.length; ++i) {
-            bObjs[i] = byteArr[i];
+    public static class KeyGenerationException extends Exception {
+        public KeyGenerationException (String msg, Throwable throwable) {
+            super(msg, throwable);
         }
-
-        return bObjs;
     }
+
+    public static PublicKey bytesToPublicKey(byte[] encoded) throws KeyGenerationException {
+        try {
+            return KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_RSA).generatePublic(new X509EncodedKeySpec(encoded));
+        } catch (Exception e) {
+            throw new KeyGenerationException(e.getMessage(), e.getCause());
+        }
+    }
+
+    public static PrivateKey bytesToPrivateKey(byte[] encoded) throws KeyGenerationException {
+        try {
+            return KeyFactory.getInstance(KeyProperties.KEY_ALGORITHM_RSA).generatePrivate(new PKCS8EncodedKeySpec(encoded));
+        } catch (Exception e) {
+            throw new KeyGenerationException(e.getMessage(), e.getCause());
+        }
+    }
+
 }

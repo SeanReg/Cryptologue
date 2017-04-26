@@ -12,6 +12,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.File;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,8 @@ public class User implements Parcelable {
     private   String    mDisplayName  = "";
     private   String    mPhoneNumber  = "";
     protected ParseUser mParseUser    = null;
+
+    private PublicKey mPublicKey = null;
 
     /**
      * Default Constructor for a User object
@@ -56,11 +59,22 @@ public class User implements Parcelable {
      * @param phonenumber String
      * @param parseUser Database object
      */
-    public User(String username, String displayName, String phonenumber, ParseUser parseUser) {
+    public User(String username, String displayName, String phonenumber, ParseUser parseUser, String pubKey) {
         mDisplayName = displayName;
         mUsername    = username;
         mPhoneNumber = phonenumber;
         mParseUser   = parseUser;
+
+        String[] strings = pubKey.replace("[", "").replace("]", "").split(", ");
+        byte[] arr = new byte[strings.length];
+        for (int i = 0; i < arr.length; ++i) {
+            arr[i] = Byte.parseByte(strings[i]);
+        }
+        try {
+            mPublicKey = KeyManager.bytesToPublicKey(arr);
+        } catch (KeyManager.KeyGenerationException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -92,6 +106,10 @@ public class User implements Parcelable {
      * @return String phoneNumber
      */
     public String getPhoneNumber() { return mPhoneNumber; }
+
+    public PublicKey getPublicKey() {
+        return mPublicKey;
+    }
 
     /**
      * Accessor for getting a picture
@@ -126,6 +144,7 @@ public class User implements Parcelable {
         dest.writeString(mUsername);
         dest.writeString(mPhoneNumber);
         dest.writeString(mParseUser.getObjectId());
+        dest.writeSerializable(mPublicKey);
     }
 
     public static final Parcelable.Creator<User> CREATOR  = new Parcelable.Creator<User>() {
@@ -144,6 +163,7 @@ public class User implements Parcelable {
         mPhoneNumber = in.readString();
         mParseUser = new ParseUser();
         mParseUser.setObjectId(in.readString());
+        mPublicKey = (PublicKey) in.readSerializable();
     }
 
     @Override
@@ -177,7 +197,7 @@ public class User implements Parcelable {
                     ArrayList<User> users = new ArrayList<User>();
                     for (ParseUser usr : objects) {
                         users.add(new User(usr.getUsername(), usr.getString(AccountManager.FIELD_DISPLAY_NAME),
-                                usr.getString(AccountManager.FIELD_PHONE_NUMBER), usr));
+                                usr.getString(AccountManager.FIELD_PHONE_NUMBER), usr, usr.getString(AccountManager.FIELD_PUBLIC_KEY)));
                     }
 
                     listener.onUsersFound(users);

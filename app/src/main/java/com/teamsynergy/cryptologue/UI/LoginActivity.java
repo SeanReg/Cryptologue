@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
 
         // TODO: Implement your own authentication logic here.
-        AccountManager.getInstance().login(username, password, new AccountManager.onAccountStatus() {
+        AccountManager.getInstance().login(this, username, password, new AccountManager.onAccountStatus() {
             @Override
             public void onLogin(UserAccount account) {
                 // On complete call either onLoginSuccess or onLoginFailed

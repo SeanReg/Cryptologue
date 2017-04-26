@@ -110,7 +110,7 @@ public class SettingsActivity extends AppCompatActivity {
         String password = _passwordText.getText().toString();
         String phone = AccountManager.getInstance().getCurrentAccount().getPhoneNumber();
 
-        manager.updateAccount(username, name, password, phone, _userAvatar, new AccountManager.onAccountStatus() {
+        manager.updateAccount(this, username, name, password, phone, _userAvatar, new AccountManager.onAccountStatus() {
             @Override
             public void onSave() {
                 onSaveSuccess();

@@ -56,9 +56,6 @@ public class HomepageActivity extends AppCompatActivity {
 
         mListView = (ListView) findViewById(R.id.chatroom_list);
 
-        KeyManager manager = new KeyManager(KeyManager.KEY_TYPE_SYMMETRIC);
-        Log.d("Key", manager.getKeys().first.toString());
-
 
         mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList, mMessagePreviewList); //add the most recent message
         mListView.setAdapter(mChatroomAdapter);

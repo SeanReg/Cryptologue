@@ -1,6 +1,9 @@
 package com.teamsynergy.cryptologue;
 
+import android.content.Context;
 import android.content.Intent;
+import android.security.KeyPairGeneratorSpec;
+import android.security.keystore.KeyProperties;
 
 import com.parse.LogInCallback;
 import com.parse.ParseACL;
@@ -13,8 +16,15 @@ import com.teamsynergy.cryptologue.UI.LoginActivity;
 
 import java.io.File;
 import java.lang.reflect.Array;
+import java.math.BigInteger;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+
+import javax.security.auth.x500.X500Principal;
 
 /**
  * Created by Sean on 3/23/2017.
@@ -56,6 +66,8 @@ public class AccountManager {
      */
     public static final String FIELD_AVATAR   = "avatar";
 
+    public static final String FIELD_PUBLIC_KEY = "publicKey";
+
     /**
      * Current UserAccount
      */
@@ -68,14 +80,22 @@ public class AccountManager {
 
     }
 
+    public static void initialize(Context context) {
+        if (mInstance.mCurAccount == null && ParseUser.getCurrentUser() != null) {
+            try {
+                String alias = ParseUser.getCurrentUser().getString(FIELD_USERNAME_CASE);
+                mInstance.constructCurrentAccount(new KeyManager(context, alias));
+            } catch (KeyManager.KeyGenerationException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * Provides an instance of the AccountManager
      * @return  Singleton instance of AccountManager
      */
     public static AccountManager getInstance() {
-        if (mInstance.mCurAccount == null && ParseUser.getCurrentUser() != null)
-            mInstance.constructCurrentAccount();
-
         return mInstance;
     }
 
@@ -100,7 +120,17 @@ public class AccountManager {
      * @param callback  successfully registers and logs user in or produces a onRegistrationError callback
      *                  that returns error from registration validation
      */
-    public void register(String username, String displayName, String password, String phone, final onAccountStatus callback) {
+    public void register(Context context, String username, String displayName, String password, String phone, final onAccountStatus callback) {
+        KeyManager kM = null;
+        try {
+            kM = new KeyManager(context, username);
+        } catch (KeyManager.KeyGenerationException e) {
+            e.printStackTrace();
+            if (callback != null)
+                callback.onRegistrationError(new ParseException(e.getCause()));
+        }
+        final KeyManager manager = kM;
+
         ParseUser user = new ParseUser();
         //user.setEmail(username);
         //Lower case the username so that usernames for login are not case sensistive
@@ -110,15 +140,21 @@ public class AccountManager {
         user.put(FIELD_PHONE_NUMBER, phone);
         //Save a correctly cased version of the username for display purposes
         user.put(FIELD_USERNAME_CASE, username);
+        user.put(FIELD_PUBLIC_KEY, Arrays.toString(kM.getPublicKey().getEncoded()));
 
         user.signUpInBackground(new SignUpCallback() {
             @Override
             public void done(ParseException e) {
                 if (callback != null) {
                     if (e == null) {
-                        constructCurrentAccount();
+                        constructCurrentAccount(manager);
                         callback.onRegistered(mCurAccount);
                     } else {
+                        try {
+                            manager.destroyKey();
+                        } catch (KeyManager.KeyGenerationException e1) {
+                            e1.printStackTrace();
+                        }
                         callback.onRegistrationError(e);
                     }
                 }
@@ -134,7 +170,7 @@ public class AccountManager {
      * @param callback  either logs user in order produces an onLoginError that returns ParseException
      *                  to user
      */
-    public void login(String username, String password, final onAccountStatus callback) {
+    public void login(final Context context, final String username, String password, final onAccountStatus callback) {
         // if (isSignedIn()) logOut();
 
         try {
@@ -144,8 +180,12 @@ public class AccountManager {
                     if (callback != null) {
                         if (user != null) {
                             // Hooray! The user is logged in
-                            constructCurrentAccount();
-                            callback.onLogin(mCurAccount);
+                            try {
+                                constructCurrentAccount(new KeyManager(context, username));
+                                callback.onLogin(mCurAccount);
+                            } catch (KeyManager.KeyGenerationException e1) {
+                                e1.printStackTrace();
+                            }
                         } else {
                             // Login failed. Look at the ParseException to see what happened.
                             callback.onLoginError(e);
@@ -168,8 +208,8 @@ public class AccountManager {
      * @param callback  produces an onSave successful or onSaveError callback to denote what succeeded
      *                  and what went wrong upon update
      */
-    public void updateAccount(String username, String displayName, String password, String phone, File avatar, final onAccountStatus callback) {
-        ParseUser user = ParseUser.getCurrentUser();
+    public void updateAccount(final Context context, final String username, String displayName, String password, String phone, File avatar, final onAccountStatus callback) {
+        final ParseUser user = ParseUser.getCurrentUser();
         //user.setEmail(username);
         //Lower case the username so that usernames for login are not case sensistive
         user.setUsername(username.toLowerCase());
@@ -184,8 +224,12 @@ public class AccountManager {
             public void done(ParseException e) {
                 if (callback != null) {
                     if (e == null) {
-                        constructCurrentAccount();
-                        callback.onSave();
+                        try {
+                            constructCurrentAccount(new KeyManager(context, user.getString(FIELD_USERNAME_CASE)));
+                            callback.onSave();
+                        } catch (KeyManager.KeyGenerationException e1) {
+                            e1.printStackTrace();
+                        }
                     } else {
                         callback.onSaveError(e);
                     }
@@ -197,9 +241,10 @@ public class AccountManager {
     /**
      * Constructs a UserAccount object from the current ParseUser
      */
-    private void constructCurrentAccount() {
+    private void constructCurrentAccount(KeyManager manager) {
         ParseUser pUser = ParseUser.getCurrentUser();
-        mCurAccount = new UserAccount(pUser.getUsername(), (String)pUser.get("displayName"), (String)pUser.get("phone"), pUser);
+        mCurAccount = new UserAccount(manager, pUser.getUsername(),
+                (String)pUser.get("displayName"), (String)pUser.get("phone"), pUser);
 
         ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
         parseACL.setPublicReadAccess(true);
