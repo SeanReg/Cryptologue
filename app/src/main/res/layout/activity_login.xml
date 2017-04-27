@@ -13,11 +13,13 @@
         android:paddingRight="24dp"
         android:weightSum="1">
 
-        <ImageView android:src="@drawable/cryptologue_logo"
+        <ImageView
+            android:layout_width="531dp"
             android:layout_height="138dp"
-            android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal"
-            android:layout_width="531dp" />
+            android:layout_marginBottom="24dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/logo_red_crop" />
 
         <!-- Email Label -->
         <android.support.design.widget.TextInputLayout
