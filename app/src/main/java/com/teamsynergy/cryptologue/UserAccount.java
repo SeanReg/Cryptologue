@@ -10,7 +10,9 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.io.File;
+import java.security.PrivateKey;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,6 +25,8 @@ import java.util.List;
 public class UserAccount extends User implements SecurityCheck {
     private boolean mIsValid = true;
 
+    private final KeyManager mKeyManager;
+
     /**
      * Constructs a UserAccount
      * @param username
@@ -30,8 +34,14 @@ public class UserAccount extends User implements SecurityCheck {
      * @param phonenumber
      * @param parseUser
      */
-    public UserAccount(String username, String displayName, String phonenumber, ParseUser parseUser) {
-        super(username, displayName, phonenumber, parseUser);
+    public UserAccount(KeyManager kM, String username, String displayName, String phonenumber, ParseUser parseUser) {
+        super(username, displayName, phonenumber, parseUser, Arrays.toString(kM.getPublicKey().getEncoded()));
+
+        mKeyManager = kM;
+    }
+
+    public PrivateKey getPrivateKey() {
+        return mKeyManager.getPrivateKey();
     }
 
     /**

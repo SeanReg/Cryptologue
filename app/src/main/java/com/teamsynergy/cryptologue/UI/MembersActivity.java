@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
 import android.widget.TextView;
 
-import com.google.android.gms.vision.text.Text;
 import com.teamsynergy.cryptologue.ObjectPasser;
 import com.teamsynergy.cryptologue.R;
 import com.teamsynergy.cryptologue.User;

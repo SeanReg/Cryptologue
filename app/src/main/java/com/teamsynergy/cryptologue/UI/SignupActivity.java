@@ -74,7 +74,7 @@ public class SignupActivity extends AppCompatActivity {
         String phone = PhoneNumberUtils.formatNumberToE164(_phoneNumberText.getText().toString(), "US");
 
         // TODO: Implement your own signup logic here.
-        AccountManager.getInstance().register(username, name, password, phone, new AccountManager.onAccountStatus() {
+        AccountManager.getInstance().register(this, username, name, password, phone, new AccountManager.onAccountStatus() {
             @Override
             public void onRegistered(UserAccount account) {
                 onSignupSuccess();

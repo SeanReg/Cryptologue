@@ -20,6 +20,8 @@ public class ParseInit {
                     .clientKey("fqi3Z155yA0xr2uZoN6SBkdh9zvlXVedDE6aEYUQ")
                     .server("https://cryptologue.back4app.io/").enableLocalDataStore().build()
             );
+
+            AccountManager.initialize(con);
         }
     }
 }
