@@ -88,12 +88,12 @@
         <activity
             android:name=".UI.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme.Dark"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.SignupActivity"
             android:label="@string/title_activity_signup"
-            android:theme="@style/AppTheme.Dark"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.ChatroomActivity"
