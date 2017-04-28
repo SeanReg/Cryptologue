@@ -79,5 +79,14 @@ public class Message {
         return mTag;
     }
 
+    @Override
+    public Message clone() {
+        Message clone = new Message();
+        clone.mMsgText = mMsgText;
+        clone.mSender = mSender;
+        clone.mTag = mTag;
+
+        return clone;
+    }
 
 }

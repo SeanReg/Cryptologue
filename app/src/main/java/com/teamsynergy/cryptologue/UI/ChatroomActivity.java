@@ -270,7 +270,7 @@ public class ChatroomActivity extends AppCompatActivity {
                 }
             }
         }
-        mChatroom.sendMessage(msg);
+        mChatroom.sendMessage(msg.clone());
         addChatMessage(msg);
         chatText.setText("");
     }

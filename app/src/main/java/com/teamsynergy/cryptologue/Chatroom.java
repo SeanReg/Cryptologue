@@ -104,12 +104,12 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     public void sendMessage(Message msg) {
         UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
         try {
-            byte[] encBytes = KeyManager.rsaEncrypt(curAcc.getPublicKey(), msg.getText().getBytes());
-
-            msg.setText(Base64.encodeToString(encBytes, 0));
             msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
 
-            cacheMessage(msg);
+            cacheMessage(msg.clone());
+
+            byte[] encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
+            msg.setText(Base64.encodeToString(encBytes, 0));
             MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,9 +124,17 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
             @Override
             public void onMessageRecieved(Message s) {
-                cacheMessage(s);
+                UserAccount currAcc = AccountManager.getInstance().getCurrentAccount();
+                try {
+                    byte[] revealed = currAcc.getKeyManager().symmetricDecrypt(mParseObj.getObjectId(), Base64.decode(s.getText(), 0));
+                    s.setText(new String(revealed, 0));
 
-                listener.onMessageRecieved(s);
+                    cacheMessage(s);
+
+                    listener.onMessageRecieved(s);
+                } catch (KeyManager.KeyGenerationException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -165,8 +173,6 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                     Message msg = null;
                     try {
                         msg = new Message(obj.getString("text"));
-                        UserAccount currAcc = AccountManager.getInstance().getCurrentAccount();
-                        msg.setText(new String(KeyManager.rsaDecrypt(currAcc.getPrivateKey(), Base64.decode(msg.getText(), 0))));
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

@@ -127,7 +127,13 @@ public class MessagingService extends Service {
                 jsonObject.put("chatroomId", chatroomId);
                 jsonObject.put("sendTo", usr.getParseUser().getObjectId());
                 try {
-                    jsonObject.put("key", Base64.encodeToString(KeyManager.rsaEncrypt(usr.getPublicKey(), key), 0));
+                    byte[] secKey = KeyManager.rsaEncrypt(usr.getPublicKey(), key);
+                    jsonObject.put("key", Base64.encodeToString(secKey, 0));
+                    String p = "";
+                    for (byte b : secKey) {
+                        p += Byte.toString(b) + ", ";
+                    }
+                    Log.d("Got Key", p);
                     //Send message
                     mSocket.sendTextMessage(jsonObject.toString());
                 } catch (Exception e) {
@@ -221,9 +227,15 @@ public class MessagingService extends Service {
                         case MESSAGE_TYPE_KEY_EXCHANGE:
                             byte[] key = Base64.decode(j.getString("key"), 0);
                             String chatroomId = j.getString("chatroomId");
-                            String userId = j.getString("userId");
+                            //String userId = j.getString("userId");
                             try {
-                                KeyManager manager = new KeyManager(getApplicationContext(), userId);
+                                String p = "";
+                                for (byte b : key) {
+                                    p += Byte.toString(b) + ", ";
+                                }
+                                Log.d("Got Key", p);
+
+                                KeyManager manager = new KeyManager(getApplicationContext(), AccountManager.getInstance().getCurrentAccount().getUsername());
                                 manager.persistSymmetricKey(chatroomId, manager.rsaDecrypt(key));
                             } catch (KeyManager.KeyGenerationException e) {
                                 e.printStackTrace();

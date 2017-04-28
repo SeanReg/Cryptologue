@@ -33,6 +33,7 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 /**
@@ -41,6 +42,7 @@ import javax.security.auth.x500.X500Principal;
 
 public class KeyManager {
     private static final String RSA_MODE =  "RSA/ECB/PKCS1Padding";
+    private static final String AES_MODE = "AES/ECB/PKCS7Padding";
 
     private KeyPair  mKeyPair  = null;
     private KeyStore mKeyStore = null;
@@ -123,6 +125,40 @@ public class KeyManager {
         } catch (Exception e) {
             throw new KeyGenerationException(e.getMessage(), e.getCause());
         }
+    }
+
+    public byte[] symmetricEncrypt(String alias, byte[] encrypt) throws KeyGenerationException {
+        byte[] symKey = getSymmetricKey(alias, false);
+
+        if (symKey != null) {
+            try {
+                Cipher c = Cipher.getInstance(AES_MODE, "BC");
+                c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symKey, KeyProperties.KEY_ALGORITHM_AES));
+                return c.doFinal(encrypt);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return null;
+    }
+
+    public byte[] symmetricDecrypt(String alias, byte[] decrypt) throws KeyGenerationException {
+        byte[] symKey = getSymmetricKey(alias, false);
+
+        if (symKey != null) {
+            try {
+                Cipher c = Cipher.getInstance(AES_MODE, "BC");
+                c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(symKey, KeyProperties.KEY_ALGORITHM_AES));
+                return c.doFinal(decrypt);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        return null;
     }
 
     public PublicKey getPublicKey() {

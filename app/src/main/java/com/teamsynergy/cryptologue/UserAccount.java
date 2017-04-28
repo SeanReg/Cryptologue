@@ -40,6 +40,10 @@ public class UserAccount extends User implements SecurityCheck {
         mKeyManager = kM;
     }
 
+    public KeyManager getKeyManager() {
+        return mKeyManager;
+    }
+
     public PrivateKey getPrivateKey() {
         return mKeyManager.getPrivateKey();
     }

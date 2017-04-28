@@ -84,7 +84,7 @@ public class AccountManager {
     public static void initialize(Context context) {
         if (mInstance.mCurAccount == null && ParseUser.getCurrentUser() != null) {
             try {
-                String alias = ParseUser.getCurrentUser().getString(FIELD_USERNAME_CASE);
+                String alias = ParseUser.getCurrentUser().getUsername();
                 mInstance.constructCurrentAccount(new KeyManager(context, alias));
             } catch (KeyManager.KeyGenerationException e) {
                 e.printStackTrace();
@@ -124,7 +124,7 @@ public class AccountManager {
     public void register(Context context, String username, String displayName, String password, String phone, final onAccountStatus callback) {
         KeyManager kM = null;
         try {
-            kM = new KeyManager(context, username);
+            kM = new KeyManager(context, username.toLowerCase());
         } catch (KeyManager.KeyGenerationException e) {
             e.printStackTrace();
             if (callback != null)
@@ -182,7 +182,7 @@ public class AccountManager {
                         if (user != null) {
                             // Hooray! The user is logged in
                             try {
-                                constructCurrentAccount(new KeyManager(context, username));
+                                constructCurrentAccount(new KeyManager(context, user.getUsername()));
                                 callback.onLogin(mCurAccount);
                             } catch (KeyManager.KeyGenerationException e1) {
                                 e1.printStackTrace();
@@ -226,7 +226,7 @@ public class AccountManager {
                 if (callback != null) {
                     if (e == null) {
                         try {
-                            constructCurrentAccount(new KeyManager(context, user.getString(FIELD_USERNAME_CASE)));
+                            constructCurrentAccount(new KeyManager(context, user.getUsername()));
                             callback.onSave();
                         } catch (KeyManager.KeyGenerationException e1) {
                             e1.printStackTrace();
