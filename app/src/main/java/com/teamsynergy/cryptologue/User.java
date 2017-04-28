@@ -2,6 +2,7 @@ package com.teamsynergy.cryptologue;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Base64;
 
 import com.parse.FindCallback;
 import com.parse.GetFileCallback;
@@ -59,19 +60,14 @@ public class User implements Parcelable {
      * @param phonenumber String
      * @param parseUser Database object
      */
-    public User(String username, String displayName, String phonenumber, ParseUser parseUser, String pubKey) {
+    public User(String username, String displayName, String phonenumber, ParseUser parseUser, byte[] pubKey) {
         mDisplayName = displayName;
         mUsername    = username;
         mPhoneNumber = phonenumber;
         mParseUser   = parseUser;
 
-        String[] strings = pubKey.replace("[", "").replace("]", "").split(", ");
-        byte[] arr = new byte[strings.length];
-        for (int i = 0; i < arr.length; ++i) {
-            arr[i] = Byte.parseByte(strings[i]);
-        }
         try {
-            mPublicKey = KeyManager.bytesToPublicKey(arr);
+            mPublicKey = KeyManager.bytesToPublicKey(pubKey);
         } catch (KeyManager.KeyGenerationException e) {
             e.printStackTrace();
         }
@@ -196,8 +192,15 @@ public class User implements Parcelable {
                 if (listener !=  null && e == null) {
                     ArrayList<User> users = new ArrayList<User>();
                     for (ParseUser usr : objects) {
-                        users.add(new User(usr.getUsername(), usr.getString(AccountManager.FIELD_DISPLAY_NAME),
-                                usr.getString(AccountManager.FIELD_PHONE_NUMBER), usr, usr.getString(AccountManager.FIELD_PUBLIC_KEY)));
+                        users.add(
+                                new User(
+                                        usr.getUsername(),
+                                        usr.getString(AccountManager.FIELD_DISPLAY_NAME),
+                                        usr.getString(AccountManager.FIELD_PHONE_NUMBER),
+                                        usr,
+                                        Base64.decode(usr.getString(AccountManager.FIELD_PUBLIC_KEY), 0)
+                                )
+                        );
                     }
 
                     listener.onUsersFound(users);

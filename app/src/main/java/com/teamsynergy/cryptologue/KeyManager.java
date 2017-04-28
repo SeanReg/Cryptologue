@@ -2,13 +2,18 @@ package com.teamsynergy.cryptologue;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.util.Pair;
 
 import com.parse.ParseException;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
+import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -20,8 +25,12 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.auth.x500.X500Principal;
@@ -31,13 +40,18 @@ import javax.security.auth.x500.X500Principal;
  */
 
 public class KeyManager {
+    private static final String RSA_MODE =  "RSA/ECB/PKCS1Padding";
+
     private KeyPair  mKeyPair  = null;
     private KeyStore mKeyStore = null;
 
     private final String mAlias;
 
+    private final Context mContext;
+
     public KeyManager(Context context, String alias) throws KeyGenerationException {
         mAlias = alias;
+        mContext = context;
 
         //Generate an RSA key pair
         try {
@@ -70,6 +84,47 @@ public class KeyManager {
         }
     }
 
+    public byte[] getSymmetricKey(String alias, boolean generate) throws KeyGenerationException {
+        SharedPreferences pref = mContext.getSharedPreferences(alias, Context.MODE_PRIVATE);
+        String enryptedKeyB64 = pref.getString(mAlias + alias, null);
+        if (enryptedKeyB64 == null) {
+            if (!generate)
+                return null;
+
+            KeyGenerator keyGen = null;
+            try {
+                keyGen = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES);
+                Key key = keyGen.generateKey();
+
+                byte[] encKey = key.getEncoded();
+                persistSymmetricKey(alias, encKey);
+
+                return encKey;
+            } catch (Exception e) {
+                throw new KeyGenerationException(e.getMessage(), e.getCause());
+            }
+        } else {
+            try {
+                return rsaDecrypt(Base64.decode(enryptedKeyB64, 0));
+            } catch (Exception e) {
+                throw new KeyGenerationException(e.getMessage(), e.getCause());
+            }
+        }
+    }
+
+    public void persistSymmetricKey(String alias, byte[] key) throws KeyGenerationException {
+        try {
+            SharedPreferences pref = mContext.getSharedPreferences(alias, Context.MODE_PRIVATE);
+            byte[] encryptedKey = rsaEncrypt(key);
+            String enryptedKeyB64 = Base64.encodeToString(encryptedKey, Base64.DEFAULT);
+            SharedPreferences.Editor edit = pref.edit();
+            edit.putString(mAlias + alias, enryptedKeyB64);
+            edit.commit();
+        } catch (Exception e) {
+            throw new KeyGenerationException(e.getMessage(), e.getCause());
+        }
+    }
+
     public PublicKey getPublicKey() {
         return mKeyPair.getPublic();
     }
@@ -98,6 +153,52 @@ public class KeyManager {
         } catch (Exception e) {
             throw new KeyGenerationException(e.getMessage(), e.getCause());
         }
+    }
+
+    public byte[] rsaEncrypt(byte[] secret) throws Exception {
+        return rsaEncrypt(mKeyPair.getPublic(), secret);
+    }
+
+    public byte[] rsaDecrypt(byte[] secret) throws Exception {
+        return rsaDecrypt(mKeyPair.getPrivate(), secret);
+    }
+
+    public static byte[] rsaEncrypt(PublicKey publicKey, byte[] secret) throws Exception{
+        // Encrypt the text
+        Cipher inputCipher = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL");
+        inputCipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, inputCipher);
+        cipherOutputStream.write(secret);
+        cipherOutputStream.close();
+
+        byte[] vals = outputStream.toByteArray();
+        return vals;
+    }
+
+    public static byte[]  rsaDecrypt(PrivateKey privateKey, byte[] encrypted) throws Exception {
+        Cipher output = null;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) { // below android m
+            output = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL"); // error in android 6: InvalidKeyException: Need RSA private or public key
+        }
+        else { // android m and above
+            output = Cipher.getInstance(RSA_MODE, "AndroidKeyStoreBCWorkaround"); // error in android 5: NoSuchProviderException: Provider not available: AndroidKeyStoreBCWorkaround
+        }
+        output.init(Cipher.DECRYPT_MODE, privateKey);
+        CipherInputStream cipherInputStream = new CipherInputStream(
+                new ByteArrayInputStream(encrypted), output);
+        ArrayList<Byte> values = new ArrayList<>();
+        int nextByte;
+        while ((nextByte = cipherInputStream.read()) != -1) {
+            values.add((byte)nextByte);
+        }
+
+        byte[] bytes = new byte[values.size()];
+        for(int i = 0; i < bytes.length; i++) {
+            bytes[i] = values.get(i).byteValue();
+        }
+        return bytes;
     }
 
     public static PrivateKey bytesToPrivateKey(byte[] encoded) throws KeyGenerationException {

@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.util.Log;
 
 import com.parse.FindCallback;
@@ -68,6 +69,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
      */
     private ArrayList<User> mMembers = new ArrayList<>();
 
+    private byte[] mSymmetricKey = null;
+
     /**
      * Chatroom default constructor
      */
@@ -101,17 +104,16 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     public void sendMessage(Message msg) {
         UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
         try {
-            byte[] encBytes = rsaEncrypt(curAcc.getPublicKey(), msg.getText().getBytes());
-            byte[] encStrBytes = (new String(encBytes, Charset.forName("US-ASCII"))).getBytes();
-            byte[] cycled = rsaDecrypt(curAcc.getPrivateKey(),encBytes);
-            msg.setText(new String(cycled));
+            byte[] encBytes = KeyManager.rsaEncrypt(curAcc.getPublicKey(), msg.getText().getBytes());
+
+            msg.setText(Base64.encodeToString(encBytes, 0));
+            msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
+
+            cacheMessage(msg);
+            MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
-
-        cacheMessage(msg);
-        MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
     }
 
     /**
@@ -163,6 +165,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                     Message msg = null;
                     try {
                         msg = new Message(obj.getString("text"));
+                        UserAccount currAcc = AccountManager.getInstance().getCurrentAccount();
+                        msg.setText(new String(KeyManager.rsaDecrypt(currAcc.getPrivateKey(), Base64.decode(msg.getText(), 0))));
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -185,7 +189,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
      * Invites multiple users to a chatroom
      * @param inv List of users
      */
-    public void inviteUsers(List<User> inv) {
+    public void inviteUsers(final List<User> inv) {
         ArrayList<ParseObject> invObjs = new ArrayList<>();
         for (int i = 0; i < inv.size(); ++i) {
             User usr = inv.get(i);
@@ -201,7 +205,18 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             //obj.saveInBackground();
             invObjs.add(obj);
         }
-        ParseObject.saveAllInBackground(invObjs);
+        ParseObject.saveAllInBackground(invObjs, new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null)
+                    return;
+
+                for (User usr : inv) {
+                    if (usr.getUsername() != AccountManager.getInstance().getCurrentAccount().getUsername())
+                        MessagingService.getInstance().socketSendKey(mSymmetricKey, mParseObj.getObjectId(), usr);
+                }
+            }
+        });
     }
 
     /**
@@ -222,6 +237,13 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 mChatroom.invalidate();
                 e.printStackTrace();
             } else {
+                UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
+                try {
+                    mChatroom.mSymmetricKey = curUser.generateSymmetriccKey(mChatroom.mParseObj.getObjectId(), true);
+                } catch (KeyManager.KeyGenerationException e1) {
+                    e1.printStackTrace();
+                }
+
                 mChatroom.inviteUsers(mChatroom.mMembers);
 
                 if (mBuiltListener != null)
@@ -261,8 +283,15 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 for(ParseObject room : objects) {
                     //Convert each parse object to a user object
                     ParseUser usr = (ParseUser) room.get("user");
-                    mMembers.add(new User(usr.getUsername(), usr.getString(AccountManager.FIELD_DISPLAY_NAME),
-                            usr.getString(AccountManager.FIELD_PHONE_NUMBER), usr, usr.getString(AccountManager.FIELD_PUBLIC_KEY)));
+                    mMembers.add(
+                            new User(
+                                    usr.getUsername(),
+                                    usr.getString(AccountManager.FIELD_DISPLAY_NAME),
+                                    usr.getString(AccountManager.FIELD_PHONE_NUMBER),
+                                    usr,
+                                    Base64.decode(usr.getString(AccountManager.FIELD_PUBLIC_KEY), 0)
+                            )
+                    );
                 }
 
                 if(listener != null) listener.onGotMembers(mMembers);
@@ -368,9 +397,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
          * @return chatroom object
          */
         public Chatroom build(boolean isNew, final BuiltListener listener) {
+            final UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
             if (isNew && !mIsBuilt) {
-                final UserAccount curUser = AccountManager.getInstance().getCurrentAccount();
-
                 addMember(curUser);
 
                 // save and get callback
@@ -378,7 +406,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 final ParseObject room = new ParseObject("Chatrooms");
 
                 if(mChatroom.mImage == null) {
-                        saveChatroom(curUser, room, f, listener);
+                    saveChatroom(curUser, room, f, listener);
                 } else {
                     f.saveInBackground(new SaveCallback() {
                         @Override
@@ -390,7 +418,16 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
 
                 mIsBuilt = true;
+            } else {
+                try {
+                    mChatroom.mSymmetricKey = curUser.generateSymmetriccKey(mChatroom.mParseObj.getObjectId(), false);
+                } catch (KeyManager.KeyGenerationException e) {
+                    e.printStackTrace();
+
+                    return null;
+                }
             }
+
 
             return mChatroom;
         }
@@ -427,77 +464,4 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         void onGotChatFuntions(List<ChatFunction> functions);
     }
 
-    private static final String RSA_MODE =  "RSA/ECB/PKCS1Padding";
-/*    private String rsaEncrypt(PublicKey key, String secret) throws Exception{
-        // Encrypt the text
-        Cipher inputCipher = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL");
-        inputCipher.init(Cipher.ENCRYPT_MODE, key);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, inputCipher);
-        cipherOutputStream.write(secret.getBytes());
-        cipherOutputStream.close();
-
-        String vals = new String(outputStream.toByteArray());
-        return vals;
-    }
-
-    private String rsaDecrypt(PrivateKey privateKey, String encrypted) throws Exception {
-        Cipher output = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) { // below android m
-            output = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL"); // error in android 6: InvalidKeyException: Need RSA private or public key
-        }
-        else { // android m and above
-            output = Cipher.getInstance(RSA_MODE, "AndroidKeyStoreBCWorkaround"); // error in android 5: NoSuchProviderException: Provider not available: AndroidKeyStoreBCWorkaround
-        }
-        output.init(Cipher.DECRYPT_MODE, privateKey);
-
-        CipherInputStream cipherInputStream = new CipherInputStream(new ByteArrayInputStream(encrypted.getBytes()), output);
-        byte[] values = new byte[cipherInputStream.available()];
-        int i = 0, next = 0;
-        while ((next = cipherInputStream.read()) != -1){
-            ++i;
-        }
-        cipherInputStream.read(values);
-
-        return new String(values);
-    }*/
-
-    private byte[] rsaEncrypt(PublicKey publicKey, byte[] secret) throws Exception{
-        // Encrypt the text
-        Cipher inputCipher = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL");
-        inputCipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        CipherOutputStream cipherOutputStream = new CipherOutputStream(outputStream, inputCipher);
-        cipherOutputStream.write(secret);
-        cipherOutputStream.close();
-
-        byte[] vals = outputStream.toByteArray();
-        return vals;
-    }
-
-    private  byte[]  rsaDecrypt(PrivateKey privateKey, byte[] encrypted) throws Exception {
-        Cipher output = null;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) { // below android m
-            output = Cipher.getInstance(RSA_MODE, "AndroidOpenSSL"); // error in android 6: InvalidKeyException: Need RSA private or public key
-        }
-        else { // android m and above
-            output = Cipher.getInstance(RSA_MODE, "AndroidKeyStoreBCWorkaround"); // error in android 5: NoSuchProviderException: Provider not available: AndroidKeyStoreBCWorkaround
-        }
-        output.init(Cipher.DECRYPT_MODE, privateKey);
-        CipherInputStream cipherInputStream = new CipherInputStream(
-                new ByteArrayInputStream(encrypted), output);
-        ArrayList<Byte> values = new ArrayList<>();
-        int nextByte;
-        while ((nextByte = cipherInputStream.read()) != -1) {
-            values.add((byte)nextByte);
-        }
-
-        byte[] bytes = new byte[values.size()];
-        for(int i = 0; i < bytes.length; i++) {
-            bytes[i] = values.get(i).byteValue();
-        }
-        return bytes;
-    }
 }

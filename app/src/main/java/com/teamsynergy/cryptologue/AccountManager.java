@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Base64;
 
 import com.parse.LogInCallback;
 import com.parse.ParseACL;
@@ -140,7 +141,7 @@ public class AccountManager {
         user.put(FIELD_PHONE_NUMBER, phone);
         //Save a correctly cased version of the username for display purposes
         user.put(FIELD_USERNAME_CASE, username);
-        user.put(FIELD_PUBLIC_KEY, Arrays.toString(kM.getPublicKey().getEncoded()));
+        user.put(FIELD_PUBLIC_KEY, Base64.encodeToString(kM.getPublicKey().getEncoded(), 0));
 
         user.signUpInBackground(new SignUpCallback() {
             @Override

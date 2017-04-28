@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -11,6 +12,7 @@ import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 
 import de.tavendo.autobahn.WebSocket;
@@ -24,6 +26,7 @@ import de.tavendo.autobahn.WebSocketException;
 public class MessagingService extends Service {
     private static final int MESSAGE_TYPE_IDENTIFY  = 1;
     private static final int MESSAGE_TYPE_SEND_CHAT = 2;
+    private static final int MESSAGE_TYPE_KEY_EXCHANGE = 3;
 
     private WebSocket mSocket = null;
     private MessageListener mMessageListener = null;
@@ -112,6 +115,34 @@ public class MessagingService extends Service {
         }
     }
 
+    public void socketSendKey(byte[] key, String chatroomId, User usr) {
+        try {
+            //Check if connected
+            checkConnection();
+
+            //Send as JSON object
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("mType", MESSAGE_TYPE_KEY_EXCHANGE);
+                jsonObject.put("chatroomId", chatroomId);
+                jsonObject.put("sendTo", usr.getParseUser().getObjectId());
+                try {
+                    jsonObject.put("key", Base64.encodeToString(KeyManager.rsaEncrypt(usr.getPublicKey(), key), 0));
+                    //Send message
+                    mSocket.sendTextMessage(jsonObject.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } catch (WebSocketClosedException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Notify the server of the user identity
      * @throws WebSocketClosedException Thrown when the Websocket is unexpectedly closed
@@ -178,17 +209,32 @@ public class MessagingService extends Service {
 
         @Override
         public void onTextMessage(String s) {
-            if (mMessageListener != null) {
                 try {
-                    //Decodes the message and forwards it to the listener
                     JSONObject j = new JSONObject(s);
-                    Message msg = new Message(j.getString("msg"));
-                    msg.setSender(j.getString("senderId"));
-                    mMessageListener.onMessageRecieved(msg);
+                    switch (j.getInt("mType")) {
+                        case MESSAGE_TYPE_SEND_CHAT:
+                            //Decodes the message and forwards it to the listener
+                            Message msg = new Message(j.getString("msg"));
+                            msg.setSender(j.getString("senderId"));
+                            if (mMessageListener != null) mMessageListener.onMessageRecieved(msg);
+                            break;
+                        case MESSAGE_TYPE_KEY_EXCHANGE:
+                            byte[] key = Base64.decode(j.getString("key"), 0);
+                            String chatroomId = j.getString("chatroomId");
+                            String userId = j.getString("userId");
+                            try {
+                                KeyManager manager = new KeyManager(getApplicationContext(), userId);
+                                manager.persistSymmetricKey(chatroomId, manager.rsaDecrypt(key));
+                            } catch (KeyManager.KeyGenerationException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
 
             Log.d("Socket", "Got message " + s);
         }

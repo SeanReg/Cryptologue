@@ -35,13 +35,17 @@ public class UserAccount extends User implements SecurityCheck {
      * @param parseUser
      */
     public UserAccount(KeyManager kM, String username, String displayName, String phonenumber, ParseUser parseUser) {
-        super(username, displayName, phonenumber, parseUser, Arrays.toString(kM.getPublicKey().getEncoded()));
+        super(username, displayName, phonenumber, parseUser, kM.getPublicKey().getEncoded());
 
         mKeyManager = kM;
     }
 
     public PrivateKey getPrivateKey() {
         return mKeyManager.getPrivateKey();
+    }
+
+    public byte[] generateSymmetriccKey(String alias, boolean generate) throws KeyManager.KeyGenerationException {
+        return mKeyManager.getSymmetricKey(alias, generate);
     }
 
     /**
