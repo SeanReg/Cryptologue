@@ -34,7 +34,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="0dp"
             android:layout_weight="0.00"
-            android:src="@drawable/sean"
+            android:src="@drawable/user_placeholder"
             android:scaleType="centerInside"
             android:layout_gravity="end" />
 

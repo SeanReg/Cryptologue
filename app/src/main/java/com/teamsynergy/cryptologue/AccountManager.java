@@ -175,7 +175,7 @@ public class AccountManager {
         // if (isSignedIn()) logOut();
 
         try {
-            ParseUser.logInInBackground(username, password, new LogInCallback() {
+            ParseUser.logInInBackground(username.toLowerCase(), password, new LogInCallback() {
                 @Override
                 public void done(ParseUser user, ParseException e) {
                     if (callback != null) {
