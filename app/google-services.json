@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "389198639837",
+    "firebase_url": "https://cryptologue-23155.firebaseio.com",
+    "project_id": "cryptologue-23155",
+    "storage_bucket": "cryptologue-23155.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389198639837:android:b0ec882144169d1d",
+        "android_client_info": {
+          "package_name": "com.teamsynergy.cryptologue"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "389198639837-qce02u9js751v48d9ld5ftcl44l78gp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7_WeQOovNqI9rKCOAyfuOuVD6FIhv4lo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

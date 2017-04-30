@@ -3,6 +3,7 @@ package com.teamsynergy.cryptologue;
 import android.content.Context;
 
 import com.parse.Parse;
+import com.parse.ParseInstallation;
 
 /**
  * Created by Sean on 3/23/2017.
@@ -20,6 +21,11 @@ public class ParseInit {
                     .clientKey("fqi3Z155yA0xr2uZoN6SBkdh9zvlXVedDE6aEYUQ")
                     .server("https://cryptologue.back4app.io/").enableLocalDataStore().build()
             );
+
+            // Update Installation
+            ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+            installation.put("GCMSenderId", "389198639837");
+            installation.saveInBackground();
 
             AccountManager.initialize(con);
         }

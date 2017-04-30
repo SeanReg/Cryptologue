@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.teamsynergy.cryptologue.UI.ChatroomActivity;
 import com.teamsynergy.cryptologue.UI.HomepageActivity;
 import com.teamsynergy.cryptologue.UI.LoginActivity;
