@@ -10,6 +10,7 @@ import com.parse.LogInCallback;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
@@ -250,6 +251,12 @@ public class AccountManager {
         ParseACL parseACL = new ParseACL(ParseUser.getCurrentUser());
         parseACL.setPublicReadAccess(true);
         pUser.setACL(parseACL);
+
+        // Update Installation
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put("GCMSenderId", "389198639837");
+        installation.put("user", ParseUser.getCurrentUser());
+        installation.saveInBackground();
     }
 
     public <T extends SecurityCheck> T createSecurityObject(Class<T> create) {

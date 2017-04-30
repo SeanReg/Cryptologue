@@ -14,7 +14,9 @@ import com.parse.GetDataCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -75,6 +77,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
     private static MessagingService.MessageListener mMessageListener = null;
 
+    private ArrayList<ParseUser> mPushMembers = new ArrayList<>();
+
     /**
      * Chatroom default constructor
      */
@@ -108,6 +112,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     public void sendMessage(Message msg) {
         UserAccount curAcc = AccountManager.getInstance().getCurrentAccount();
         try {
+            msg.setChatroom(mParseObj.getObjectId());
             msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
 
             cacheMessage(msg.clone());
@@ -115,6 +120,16 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             byte[] encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
             msg.setText(Base64.encodeToString(encBytes, 0));
             MessagingService.getInstance().socketSendMessage(msg.getText(), msg.getChatroom());
+
+            // Create our Installation query
+            ParseQuery pushQuery = ParseInstallation.getQuery();
+            pushQuery.whereContainedIn("user", mPushMembers);
+
+            // Send push notification to query
+            ParsePush push = new ParsePush();
+            push.setQuery(pushQuery); // Set our Installation query
+            push.setMessage("New message in " + mName);
+            push.sendInBackground();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -242,8 +257,12 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             User usr = inv.get(i);
 
             if (mMembers != inv) {
-                if (mMembers.contains(usr)) continue;
-                else mMembers.add(usr);
+                if (mMembers.contains(usr)) {
+                    continue;
+                } else {
+                    mMembers.add(usr);
+                    mPushMembers.add(usr.getParseUser());
+                }
             }
 
             ParseObject obj = new ParseObject("RoomLookup");
@@ -321,12 +340,17 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         ParseQuery query = new ParseQuery("RoomLookup");
         query.whereEqualTo("chatroom", mParseObj);
         query.include("user");
+
         query.findInBackground(new FindCallback<ParseObject>() {
 
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if(e != null) return;
+
+                UserAccount currAcc = AccountManager.getInstance().getCurrentAccount();
+
                 mMembers.clear();
+                mPushMembers.clear();
                 for(ParseObject room : objects) {
                     //Convert each parse object to a user object
                     ParseUser usr = (ParseUser) room.get("user");
@@ -339,6 +363,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                                     Base64.decode(usr.getString(AccountManager.FIELD_PUBLIC_KEY), 0)
                             )
                     );
+
+                    if (!usr.equals(currAcc.getParseUser()))
+                        mPushMembers.add(usr);
                 }
 
                 if(listener != null) listener.onGotMembers(mMembers);
@@ -434,6 +461,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                         return;
                 }
                 mChatroom.mMembers.add(member);
+
+                if (!AccountManager.getInstance().getCurrentAccount().getParseUser().equals(member.getParseUser()))
+                    mChatroom.mPushMembers.add(member.getParseUser());
             }
         }
 
