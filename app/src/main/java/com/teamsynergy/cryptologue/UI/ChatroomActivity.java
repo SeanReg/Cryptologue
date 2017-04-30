@@ -61,7 +61,6 @@ public class ChatroomActivity extends AppCompatActivity {
     private boolean side = false;
     private String tag;
 
-    private Button buttonChatRoomName;
     private Button buttonCreateEvent;
     private Button buttonCreatePoll;
     private Button buttonPolls;
@@ -87,7 +86,6 @@ public class ChatroomActivity extends AppCompatActivity {
 
         buttonSend = (Button) findViewById(R.id.send);
 
-        buttonChatRoomName = (Button) findViewById(R.id.chatroomname_button);
         buttonCreateEvent = (Button) findViewById(R.id.create_events_button);
         buttonCreatePoll = (Button) findViewById(R.id.create_poll_button);
         buttonEvents = (Button) findViewById(R.id.events_button);
@@ -145,13 +143,6 @@ public class ChatroomActivity extends AppCompatActivity {
             }
         });
 
-        buttonChatRoomName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), ChatRoomNameActivity.class));
-            }
-        });
-
         buttonCreatePoll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -172,7 +163,7 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mChatroom.getChatFunctions(Poll.class, ChatFunctionActivity.chatFunctionsListener());
-                ChatFunctionActivity.setOpenActivity(PollsActivity.class);
+                ChatFunctionActivity.setOpenActivity("Polls", PollsActivity.class);
                 startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
             }
         });
@@ -201,7 +192,7 @@ public class ChatroomActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 mChatroom.getChatFunctions(Event.class, ChatFunctionActivity.chatFunctionsListener());
-                ChatFunctionActivity.setOpenActivity(EventActivity.class);
+                ChatFunctionActivity.setOpenActivity("Events", EventActivity.class);
                 startActivity(new Intent(getApplicationContext(), ChatFunctionActivity.class));
             }
         });
@@ -217,15 +208,28 @@ public class ChatroomActivity extends AppCompatActivity {
                 listView.setSelection(chatArrayAdapter.getCount() - 1);
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         mChatroom.setMessageListener(mMessageRecieved);
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mChatroom.setMessageListener(null);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+/*        MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_overflow, menu);
-        inflater.inflate(R.menu.menu_chatroom_icon, menu);
+        inflater.inflate(R.menu.menu_chatroom_icon, menu);*/
 
 
         addToActionBar(menu);
@@ -257,6 +261,11 @@ public class ChatroomActivity extends AppCompatActivity {
 
     private void sendChatMessage() {
         String msgTxt = chatText.getText().toString();
+
+        //No blank messages!
+        if (msgTxt.replace(" ", "").length() == 0)
+            return;
+
         Message msg = new Message(msgTxt);
         msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
         if(msgTxt.contains("@")) {

@@ -24,6 +24,7 @@ public class ChatFunctionActivity extends AppCompatActivity {
     private static ArrayList<ChatFunction> mChatFunctionList = new ArrayList<>();
     private static ChatFunctionActivity mInstance = null;
     private static Class mOpenActivity;
+    private static String mSimpleName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,13 +36,16 @@ public class ChatFunctionActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.chatfunctions_list);
         mChatFunctionAdapter = new ChatFunctionAdapter(this, mChatFunctionList, mOpenActivity);
         mListView.setAdapter(mChatFunctionAdapter);
+
+        getSupportActionBar().setTitle(mSimpleName);
     }
 
     public static Chatroom.GotChatFunctionsListener chatFunctionsListener() {
         return mChatFunctionsListener;
     }
 
-    public static void setOpenActivity(Class activity) {
+    public static void setOpenActivity(String simpleName, Class activity) {
+        mSimpleName = simpleName;
         mOpenActivity = activity;
     }
 

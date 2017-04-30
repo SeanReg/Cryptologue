@@ -28,8 +28,10 @@ public class MessagingService extends Service {
     private static final int MESSAGE_TYPE_SEND_CHAT = 2;
     private static final int MESSAGE_TYPE_KEY_EXCHANGE = 3;
 
+    public static String SOCKET_IDENTITY = null;
+
     private WebSocket mSocket = null;
-    private MessageListener mMessageListener = null;
+    private MessageListener mMessageListener = Chatroom.CHATROOM_MESSAGE_LISTENER;
 
     private static MessagingService mServiceInstance = null;
 
@@ -84,9 +86,9 @@ public class MessagingService extends Service {
         mSocket.connect(server, mSocketObserver);
     }
 
-    public void setMessagingListener(MessageListener listener) {
+/*    public void setMessagingListener(MessageListener listener) {
         mMessageListener = listener;
-    }
+    }*/
 
     /**
      * Sends a message to the server through a Websocket
@@ -162,7 +164,8 @@ public class MessagingService extends Service {
         try {
             //Set message type, identitfy and send message
             jsonObject.put("mType", MESSAGE_TYPE_IDENTIFY);
-            jsonObject.put("clientId", accountManager.getCurrentAccount().getParseUser().getObjectId());
+            SOCKET_IDENTITY = accountManager.getCurrentAccount().getParseUser().getObjectId();
+            jsonObject.put("clientId", SOCKET_IDENTITY);
             mSocket.sendTextMessage(jsonObject.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -221,6 +224,7 @@ public class MessagingService extends Service {
                         case MESSAGE_TYPE_SEND_CHAT:
                             //Decodes the message and forwards it to the listener
                             Message msg = new Message(j.getString("msg"));
+                            msg.setChatroom(j.getString("chatroomId"));
                             msg.setSender(j.getString("senderId"));
                             if (mMessageListener != null) mMessageListener.onMessageRecieved(msg);
                             break;

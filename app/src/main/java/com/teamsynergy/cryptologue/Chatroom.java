@@ -26,6 +26,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -33,6 +34,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.crypto.Cipher;
@@ -70,6 +72,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     private ArrayList<User> mMembers = new ArrayList<>();
 
     private byte[] mSymmetricKey = null;
+
+    private static MessagingService.MessageListener mMessageListener = null;
 
     /**
      * Chatroom default constructor
@@ -110,7 +114,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
             byte[] encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
             msg.setText(Base64.encodeToString(encBytes, 0));
-            MessagingService.getInstance().socketSendMessage(msg.getText(), mParseObj.getObjectId());
+            MessagingService.getInstance().socketSendMessage(msg.getText(), msg.getChatroom());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,7 +125,8 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
      * @param listener notifies that a message has been received
      */
     public void setMessageListener(final MessagingService.MessageListener listener) {
-        MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
+        mMessageListener = listener;
+/*        MessagingService.getInstance().setMessagingListener(new MessagingService.MessageListener() {
             @Override
             public void onMessageRecieved(Message s) {
                 UserAccount currAcc = AccountManager.getInstance().getCurrentAccount();
@@ -136,7 +141,41 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                     e.printStackTrace();
                 }
             }
-        });
+        });*/
+    }
+
+    //NOTE - This needs to be set as the primary message listener
+    //This will then call the listener for the current chatroom
+    //Date object needs to be added to local cache for sorting
+    //Push Notifications
+    //Is Read field
+    //Precautions for a failed decryption (Which will occur when tagging is added)
+    public static final MessagingService.MessageListener CHATROOM_MESSAGE_LISTENER = new MessagingService.MessageListener() {
+        @Override
+        public void onMessageRecieved(Message s) {
+            KeyManager manager = AccountManager.getInstance().getCurrentAccount().getKeyManager();
+            try {
+                byte[] revealed = manager.symmetricDecrypt(s.getChatroom(), Base64.decode(s.getText(), 0));
+
+                s.setText(new String(revealed));
+
+                sCacheMessage(s);
+
+                if (mMessageListener != null)
+                    mMessageListener.onMessageRecieved(s);
+            } catch (KeyManager.KeyGenerationException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private static void sCacheMessage(Message msg) {
+        ParseObject msgObject = new ParseObject("Messages");
+        msgObject.put("userId", msg.getSender());
+        msgObject.put("chatroomId", msg.getChatroom());
+        msgObject.put("text", msg.getText());
+        msgObject.put("time", new Date());
+        msgObject.pinInBackground();
     }
 
     /**
@@ -144,11 +183,13 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
      * @param msg Message object to cache
      */
     private void cacheMessage(Message msg) {
-        ParseObject msgObject = new ParseObject("Messages");
+        msg.setChatroom(mParseObj.getObjectId());
+        sCacheMessage(msg);
+/*        ParseObject msgObject = new ParseObject("Messages");
         msgObject.put("userId", msg.getSender());
         msgObject.put("chatroomId", mParseObj.getObjectId());
         msgObject.put("text", msg.getText());
-        msgObject.pinInBackground();
+        msgObject.pinInBackground();*/
     }
 
     /**
@@ -159,9 +200,9 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     public void getCachedMessages(final MessagingService.MessageListener listener, Integer limit) {
         ParseQuery query = new ParseQuery("Messages");
         if (limit == null || limit != 1)
-            query.orderByAscending("createdAt");
+            query.orderByAscending("time");
         else
-            query.orderByDescending("createdAt");
+            query.orderByDescending("time");
         query.whereEqualTo("chatroomId", mParseObj.getObjectId());
         if (limit != null) query.setLimit(limit);
         query.fromLocalDatastore();

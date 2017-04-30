@@ -10,6 +10,7 @@ public class Message {
     private String mMsgText = "";
     private String mSender = "";
     private User mTag;
+    private String mChatroom = "";
 
     public Message() {
 
@@ -79,12 +80,21 @@ public class Message {
         return mTag;
     }
 
+    public void setChatroom(String id) {
+        mChatroom = id;
+    }
+
+    public String getChatroom() {
+        return mChatroom;
+    }
+
     @Override
     public Message clone() {
         Message clone = new Message();
         clone.mMsgText = mMsgText;
         clone.mSender = mSender;
         clone.mTag = mTag;
+        clone.mChatroom = mChatroom;
 
         return clone;
     }
