@@ -92,10 +92,8 @@ public class MessagingService extends Service {
 
     /**
      * Sends a message to the server through a Websocket
-     * @param msg the message to send to the sever
-     * @param chatroomId the Chatroom associated with the message
      */
-    public void socketSendMessage(String msg, String chatroomId) {
+    public void socketSendMessage(Message m) {
         try {
             //Check if connected
             checkConnection();
@@ -104,8 +102,9 @@ public class MessagingService extends Service {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("mType", MESSAGE_TYPE_SEND_CHAT);
-                jsonObject.put("chatroomId", chatroomId);
-                jsonObject.put("msg", msg);
+                jsonObject.put("chatroomId", m.getChatroom());
+                jsonObject.put("msg", m.getText());
+                jsonObject.put("tagged", (m.getTag() != null));
 
                 //Send message
                 mSocket.sendTextMessage(jsonObject.toString());
@@ -226,6 +225,7 @@ public class MessagingService extends Service {
                             Message msg = new Message(j.getString("msg"));
                             msg.setChatroom(j.getString("chatroomId"));
                             msg.setSender(j.getString("senderId"));
+                            if (j.getBoolean("tagged")) msg.setTag(new User());
                             if (mMessageListener != null) mMessageListener.onMessageRecieved(msg);
                             break;
                         case MESSAGE_TYPE_KEY_EXCHANGE:

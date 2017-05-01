@@ -57,7 +57,7 @@ public class HomepageActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.chatroom_list);
 
 
-        mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList, mMessagePreviewList); //add the most recent message
+        mChatroomAdapter = new ChatroomListAdapter(this, mChatroomList); //add the most recent message
         mListView.setAdapter(mChatroomAdapter);
 
     }
@@ -133,6 +133,7 @@ public class HomepageActivity extends AppCompatActivity {
                     mChatroomList.add(room);
                     //add most recent message of chatroom to mMessagePreviewList
                 }
+                mChatroomAdapter.updateAdapter(mChatroomList);
                 mListView.setAdapter(mChatroomAdapter);
             }
         });

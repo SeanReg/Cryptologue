@@ -34,16 +34,17 @@ public class ChatroomListAdapter extends BaseAdapter {
     private ArrayList<Chatroom> mDataSource;
     private HashMap<String, Bitmap> mDataBitmaps = new HashMap<>();
     private HashMap<String, String> mLastMsg     = new HashMap<>();
-    private ArrayList<String> mMessage;
 
 
-    public ChatroomListAdapter(Context context, ArrayList<Chatroom> rooms, ArrayList<String> messages){
+    public ChatroomListAdapter(Context context, ArrayList<Chatroom> rooms){
         mContext = context;
-        mDataSource = rooms;
-        mMessage = messages;
+        mDataSource = new ArrayList<>(rooms);
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
 
-
+    public void updateAdapter(ArrayList<Chatroom> rooms) {
+        mLastMsg.clear();
+        mDataSource = new ArrayList<>(rooms);
     }
 
     @Override

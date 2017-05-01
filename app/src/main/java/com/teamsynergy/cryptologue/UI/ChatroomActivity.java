@@ -271,8 +271,9 @@ public class ChatroomActivity extends AppCompatActivity {
         if(msgTxt.contains("@")) {
             String text = msgTxt.toLowerCase();
             for (int i = 0; i < mMembers.size(); ++i) {     //loops thru members of chatroom and see if their display name was in the string
-                if (text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase()) != -1) {
-                    if (text.indexOf("@") == text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase()) - 1) {
+                int index = text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase());
+                if (index != -1) {
+                    if (text.indexOf("@") == index - 1) {
                         msg.setTag(mMembers.get(i).first);
                         break;
                     }

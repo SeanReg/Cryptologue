@@ -117,9 +117,14 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
 
             cacheMessage(msg.clone());
 
-            byte[] encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
+            byte[] encBytes = null;
+            if (msg.getTag() == null) {
+                encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
+            } else {
+                encBytes = KeyManager.rsaEncrypt(msg.getTag().getPublicKey(), msg.getText().getBytes());
+            }
             msg.setText(Base64.encodeToString(encBytes, 0));
-            MessagingService.getInstance().socketSendMessage(msg.getText(), msg.getChatroom());
+            MessagingService.getInstance().socketSendMessage(msg);
 
             // Create our Installation query
             ParseQuery pushQuery = ParseInstallation.getQuery();
@@ -170,7 +175,22 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         public void onMessageRecieved(Message s) {
             KeyManager manager = AccountManager.getInstance().getCurrentAccount().getKeyManager();
             try {
-                byte[] revealed = manager.symmetricDecrypt(s.getChatroom(), Base64.decode(s.getText(), 0));
+                byte[] revealed = null;
+                if (s.getTag() == null) {
+                    revealed = manager.symmetricDecrypt(s.getChatroom(), Base64.decode(s.getText(), 0));
+                } else {
+                    byte[] b64Decode = Base64.decode(s.getText(), 0);
+                    try {
+                        revealed = manager.rsaDecrypt(b64Decode);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //Couldn't decrypt - probably not meant for us
+                        revealed = b64Decode;
+                    }
+
+                    if (revealed.length == 0)
+                        revealed = b64Decode;
+                }
 
                 s.setText(new String(revealed));
 
