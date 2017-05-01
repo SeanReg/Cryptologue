@@ -227,9 +227,9 @@ public class ChatroomActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-/*        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_overflow, menu);
-        inflater.inflate(R.menu.menu_chatroom_icon, menu);*/
+        MenuInflater inflater = getMenuInflater();
+        /*inflater.inflate(R.menu.menu_overflow, menu);*/
+        inflater.inflate(R.menu.menu_chatroom_icon, menu);
 
 
         addToActionBar(menu);
@@ -271,7 +271,7 @@ public class ChatroomActivity extends AppCompatActivity {
         if(msgTxt.contains("@")) {
             String text = msgTxt.toLowerCase();
             for (int i = 0; i < mMembers.size(); ++i) {     //loops thru members of chatroom and see if their display name was in the string
-                int index = text.indexOf(mMembers.get(i).first.getDisplayName().toLowerCase());
+                int index = text.indexOf(mMembers.get(i).first.getUsername().toLowerCase());
                 if (index != -1) {
                     if (text.indexOf("@") == index - 1) {
                         msg.setTag(mMembers.get(i).first);
