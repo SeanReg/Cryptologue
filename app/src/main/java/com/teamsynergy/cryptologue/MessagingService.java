@@ -2,6 +2,7 @@ package com.teamsynergy.cryptologue;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Base64;
@@ -14,6 +15,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.tavendo.autobahn.WebSocket;
 import de.tavendo.autobahn.WebSocketConnection;
@@ -38,6 +41,9 @@ public class MessagingService extends Service {
     private UserAccount mCurAccount = null;
     private List<Chatroom> mChatrooms = null;
 
+    private Timer   mTimer = null;
+    private Handler mMainServiceThread = null;
+
     public interface  MessageListener {
         public void onMessageRecieved(Message s);
     }
@@ -45,6 +51,7 @@ public class MessagingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mServiceInstance = this;
+        mMainServiceThread = new Handler();
 
         try {
             connectSocket();
@@ -73,12 +80,16 @@ public class MessagingService extends Service {
         if (mCurAccount == null)
             throw new WebSocketException("No current account!");
 
+        doConnect();
+    }
+
+    private void doConnect() throws WebSocketException {
         //Connect to the server
         mSocket = new WebSocketConnection();
         URI server = null;
         try {
             //The server location
-             server = new URI("ws://ec2-52-33-81-186.us-west-2.compute.amazonaws.com:8080");
+            server = new URI("ws://ec2-52-33-81-186.us-west-2.compute.amazonaws.com:8080");
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -154,7 +165,7 @@ public class MessagingService extends Service {
      * Notify the server of the user identity
      * @throws WebSocketClosedException Thrown when the Websocket is unexpectedly closed
      */
-    private void socketIdentify() throws WebSocketClosedException {
+    public void socketIdentify() throws WebSocketClosedException {
         checkConnection();
 
         //Create JSON object
@@ -163,7 +174,10 @@ public class MessagingService extends Service {
         try {
             //Set message type, identitfy and send message
             jsonObject.put("mType", MESSAGE_TYPE_IDENTIFY);
-            SOCKET_IDENTITY = accountManager.getCurrentAccount().getParseUser().getObjectId();
+
+            SOCKET_IDENTITY = "";
+            if (accountManager.getCurrentAccount() != null)
+                SOCKET_IDENTITY = accountManager.getCurrentAccount().getParseUser().getObjectId();
             jsonObject.put("clientId", SOCKET_IDENTITY);
             mSocket.sendTextMessage(jsonObject.toString());
         } catch (JSONException e) {
@@ -176,14 +190,15 @@ public class MessagingService extends Service {
      * @throws WebSocketClosedException thrown if the Websocket is not connected
      */
     private void checkConnection() throws WebSocketClosedException {
-        if (mSocket == null || !mSocket.isConnected())
+        if (mSocket == null || !mSocket.isConnected()) {
             throw new WebSocketClosedException("WebSocket not connected!");
+        }
     }
 
     /**
      * Exception for when the Websocket is closed
      */
-    private class WebSocketClosedException extends WebSocketException {
+    public class WebSocketClosedException extends WebSocketException {
         public WebSocketClosedException(String message) {
             super(message);
         }
@@ -213,6 +228,24 @@ public class MessagingService extends Service {
         @Override
         public void onClose(WebSocket.WebSocketConnectionObserver.WebSocketCloseNotification webSocketCloseNotification, String s) {
             Log.d("Socket", "Disconnected from Server!");
+
+            //Attempt a reconnect
+            mTimer = new Timer();
+            mTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    mMainServiceThread.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                connectSocket();
+                            } catch (WebSocketException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }, 10000);
         }
 
         @Override

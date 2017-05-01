@@ -151,6 +151,12 @@ public class AccountManager {
                     if (e == null) {
                         constructCurrentAccount(manager);
                         callback.onRegistered(mCurAccount);
+
+                        try {
+                            MessagingService.getInstance().socketIdentify();
+                        } catch (MessagingService.WebSocketClosedException e1) {
+                            e1.printStackTrace();
+                        }
                     } else {
                         try {
                             manager.destroyKey();
@@ -185,7 +191,11 @@ public class AccountManager {
                             try {
                                 constructCurrentAccount(new KeyManager(context, user.getUsername()));
                                 callback.onLogin(mCurAccount);
+
+                                MessagingService.getInstance().socketIdentify();
                             } catch (KeyManager.KeyGenerationException e1) {
+                                e1.printStackTrace();
+                            } catch (MessagingService.WebSocketClosedException e1) {
                                 e1.printStackTrace();
                             }
                         } else {
