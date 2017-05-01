@@ -84,7 +84,7 @@ public class SelectContactsActivity extends AppCompatActivity {
         ContentResolver resolver = getContentResolver();
         Cursor cursor = resolver.query(ContactsContract.Contacts.CONTENT_URI,null,null,null,null);
 
-        HashMap<String, String> contactHash = new HashMap<>();
+        final HashMap<String, String> contactHash = new HashMap<>();
         while(cursor.moveToNext()){
             String id= cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
             String name= cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
@@ -99,19 +99,26 @@ public class SelectContactsActivity extends AppCompatActivity {
             }
         }
 
-        for (String phoneNumber : contactHash.keySet()) {
-            mContactList.add(new Pair<String, String>(contactHash.get(phoneNumber), phoneNumber));
-        }
-
-        Collections.sort(mContactList, new Comparator<Pair<String, String>>() {
+        String[] numbers = new String[contactHash.keySet().size()];
+        contactHash.keySet().toArray(numbers);
+        User.findByPhoneNumber(Arrays.asList(numbers), new User.UsersFoundListener() {
             @Override
-            public int compare(Pair<String, String> o1, Pair<String, String> o2) {
-                return o1.first.compareTo(o2.first);
+            public void onUsersFound(List<User> users) {
+                for (User usr : users) {
+                    mContactList.add(new Pair<String, String>(contactHash.get(usr.getPhoneNumber()), usr.getPhoneNumber()));
+                }
+
+                Collections.sort(mContactList, new Comparator<Pair<String, String>>() {
+                    @Override
+                    public int compare(Pair<String, String> o1, Pair<String, String> o2) {
+                        return o1.first.compareTo(o2.first);
+                    }
+                });
+
+
+                mListView.setAdapter(adapter);
             }
         });
-
-
-        mListView.setAdapter(adapter);
     }
 
     private void getContactsPermission() {
