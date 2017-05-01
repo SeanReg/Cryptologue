@@ -21,7 +21,7 @@
                 android:id="@+id/topic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
+                android:inputType="textCapSentences"
                 android:hint="Topic" />
         </android.support.design.widget.TextInputLayout>
 
