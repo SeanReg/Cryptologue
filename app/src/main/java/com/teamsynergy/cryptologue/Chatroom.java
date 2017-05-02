@@ -116,12 +116,13 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
 
             cacheMessage(msg.clone());
-
+            
             byte[] encBytes = null;
             if (msg.getTag() == null) {
                 encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
             } else {
                 encBytes = KeyManager.rsaEncrypt(msg.getTag().getPublicKey(), msg.getText().getBytes());
+                encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), encBytes);
             }
             msg.setText(Base64.encodeToString(encBytes, 0));
             MessagingService.getInstance().socketSendMessage(msg);
@@ -175,21 +176,21 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
         public void onMessageRecieved(Message s) {
             KeyManager manager = AccountManager.getInstance().getCurrentAccount().getKeyManager();
             try {
+                byte[] symRevealed = manager.symmetricDecrypt(s.getChatroom(), Base64.decode(s.getText(), 0));
                 byte[] revealed = null;
-                if (s.getTag() == null) {
-                    revealed = manager.symmetricDecrypt(s.getChatroom(), Base64.decode(s.getText(), 0));
-                } else {
-                    byte[] b64Decode = Base64.decode(s.getText(), 0);
+                if (s.getTag() != null) {
                     try {
-                        revealed = manager.rsaDecrypt(b64Decode);
+                        revealed = manager.rsaDecrypt(symRevealed);
                     } catch (Exception e) {
                         e.printStackTrace();
                         //Couldn't decrypt - probably not meant for us
-                        revealed = b64Decode;
+                        revealed = symRevealed;
                     }
 
                     if (revealed.length == 0)
-                        revealed = b64Decode;
+                        revealed = symRevealed;
+                } else {
+                    revealed = symRevealed;
                 }
 
                 s.setText(new String(revealed));
