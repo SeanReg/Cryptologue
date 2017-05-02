@@ -27,7 +27,7 @@ public class EventActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
 
-        Event event = (Event)ObjectPasser.popObject("chatfunction");
+        final Event event = (Event)ObjectPasser.popObject("chatfunction");
         startDate = (TextView)findViewById(R.id.start_date);
         startDate.setText("Start Date: " + event.getStart().toString());
 
@@ -55,7 +55,7 @@ public class EventActivity extends AppCompatActivity{
 
                // Uri gmmIntentUri = Uri.parse("geo:" + mSelectedPlace.getLatLng().latitude + "," +
                  //       mSelectedPlace.getLatLng().longitude + "?q=" + mSelectedPlace.getAddress().toString());
-                Uri gmmIntentUri = Uri.parse("geo:37.7749,-122.4194?q=101+main+street");
+                Uri gmmIntentUri = Uri.parse("geo:" + event.getCoordinates() + "?q=" + event.getAddress());
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 if (mapIntent.resolveActivity(getPackageManager()) != null) {

@@ -116,7 +116,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             msg.setSender(AccountManager.getInstance().getCurrentAccount().getParseUser().getObjectId());
 
             cacheMessage(msg.clone());
-            
+
             byte[] encBytes = null;
             if (msg.getTag() == null) {
                 encBytes = curAcc.getKeyManager().symmetricEncrypt(mParseObj.getObjectId(), msg.getText().getBytes());
@@ -402,6 +402,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
     public void getChatFunctions(final Class<? extends ChatFunction> funcClass, final GotChatFunctionsListener listener) {
         String dbName = (funcClass.getSimpleName() + "s").toLowerCase();
         ParseQuery query = mParseObj.getRelation(dbName).getQuery();
+        query.orderByDescending("createdAt");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {

@@ -2,6 +2,7 @@ package com.teamsynergy.cryptologue;
 
 import android.graphics.Bitmap;
 
+import com.google.android.gms.location.places.Place;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
@@ -19,6 +20,7 @@ public class Event extends ChatFunction {
     private Date mEventEnd = null;*/
     private Bitmap mEventPhoto = null;
     private String mLocationAddress = "";
+    private String mLocationCoords = "";
 
     public Event() {
 
@@ -32,6 +34,14 @@ public class Event extends ChatFunction {
         return mLocationAddress;
     }
 
+    /**
+     * Gets the address of the event
+     * @return a String containing the Event location
+     */
+    public String getCoordinates() {
+        return mLocationCoords;
+    }
+
     public static class Builder extends ChatFunction.Builder {
         private final Event mEvent;
 
@@ -41,11 +51,25 @@ public class Event extends ChatFunction {
 
         /**
          * Sets the address for the event
+         */
+        public void setPlace(Place place) {
+            if (mCFunction != null) {
+                mEvent.mLocationAddress = place.getAddress().toString();
+                mEvent.mLocationCoords = Double.toString(place.getLatLng().latitude) +
+                "," +
+                Double.toString(place.getLatLng().longitude);
+            }
+        }
+
+        /**
+         * Sets the address for the event
          * @param address the address of the event
          */
-        public void setAddress(String address) {
-            if (mCFunction != null)
+        public void setPlace(String address, String coords) {
+            if (mCFunction != null) {
                 mEvent.mLocationAddress = address;
+                mEvent.mLocationCoords = coords;
+            }
         }
 
         /**
@@ -63,6 +87,7 @@ public class Event extends ChatFunction {
                 event.put("endDate", mCFunction.mEndDate);
                 event.put("description", mCFunction.mDescritpion);
                 event.put("address", mEvent.mLocationAddress);
+                event.put("coord", mEvent.mLocationCoords);
 
                 //Save to database
                 event.saveInBackground(new SaveCallback() {
@@ -98,7 +123,7 @@ public class Event extends ChatFunction {
                 event.setDescription(obj.getString("description"));
                 event.setStartDate(obj.getDate("startDate"));
                 event.setEndDate(obj.getDate("endDate"));
-                event.setAddress(obj.getString("address"));
+                event.setPlace(obj.getString("address"), obj.getString("coord"));
                 events.add(event.build(false, room));
             }
 

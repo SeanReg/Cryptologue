@@ -130,7 +130,7 @@
         <activity
             android:name=".UI.MembersActivity"
             android:icon="@drawable/arrow_bg1"
-            android:label="MembersActivity"
+            android:label="Members"
             android:theme="@style/AppTheme.Dark.ActionBar"
             android:screenOrientation="portrait"/>
         <activity
@@ -142,6 +142,7 @@
         <activity
             android:name=".UI.SelectContactsActivity"
             android:theme="@style/AppTheme.Dark.ActionBar"
+            android:label="Contacts"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".UI.SettingsActivity"

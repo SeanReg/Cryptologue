@@ -11,6 +11,9 @@ import android.widget.DatePicker;
 import android.view.View;
 import android.widget.EditText;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import android.widget.TimePicker;
 
 import com.google.android.gms.common.api.Status;
@@ -86,10 +89,20 @@ public class CreateEventActivity extends AppCompatActivity {
                 //builder.setStartDate(mEndDate.getText());
                 //mStartTime.getText();
                 //mEndTime.getText();
+                int sM = ((Date)mStartTime.getTag()).getMinutes(), eM = ((Date)mEndTime.getTag()).getMinutes();
+                int sH = ((Date)mStartTime.getTag()).getHours(), eH = ((Date)mEndTime.getTag()).getHours();
+                Date sD = ((Date)mStartDate.getTag()), eD = ((Date)mEndDate.getTag());
+                sD.setHours(sH);
+                sD.setMinutes(sM);
+                eD.setHours(eH);
+                eD.setMinutes(eM);
+
+                builder.setStartDate(sD);
+                builder.setEndDate(eD);
                 builder.setDescription(mDescription.getText().toString());
                 builder.setName(mName.getText().toString());
                 if(mSelectedPlace != null) {
-                    builder.setAddress(mSelectedPlace.getAddress().toString());
+                    builder.setPlace(mSelectedPlace);
                     //mSelectedPlace.getLatLng();
                     //mSelectedPlace.getName();
                 }
@@ -109,17 +122,17 @@ public class CreateEventActivity extends AppCompatActivity {
                 view.clearFocus();
                 final Calendar c = Calendar.getInstance();
                 int mYear = c.get(Calendar.YEAR); // current year
-                int mMonth = c.get(Calendar.MONTH); // current month
+                final int mMonth = c.get(Calendar.MONTH); // current month
                 int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
                 // date picker dialog
                 datePickerDialog = new DatePickerDialog(CreateEventActivity.this,
                         new DatePickerDialog.OnDateSetListener() {
 
                             @Override
-                            public void onDateSet(DatePicker datePicker, int year,
-                                                  int monthOfYear, int dayOfMonth) {
+                            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
                                 // set day of month , month and year value in the edit text
                                 ((EditText) view).setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                                view.setTag((new GregorianCalendar(year,  monthOfYear, dayOfMonth).getTime()));
 
                             }
                         }, mYear, mMonth, mDay);
@@ -149,6 +162,7 @@ public class CreateEventActivity extends AppCompatActivity {
                             mSelectedMinuteString= "0" + Integer.toString(selectedMinute);
                         }
                         ((EditText)view).setText(selectedHour + ":" + mSelectedMinuteString);
+                        view.setTag(new Date(0, 0, 0, selectedHour, selectedMinute));
                     }
                 }, 12, 0, false);//Yes 24 hour time
                 mTimePicker.setTitle("Select Time");
