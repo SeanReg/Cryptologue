@@ -127,18 +127,22 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
             msg.setText(Base64.encodeToString(encBytes, 0));
             MessagingService.getInstance().socketSendMessage(msg);
 
-            // Create our Installation query
-            ParseQuery pushQuery = ParseInstallation.getQuery();
-            pushQuery.whereContainedIn("user", mPushMembers);
-
-            // Send push notification to query
-            ParsePush push = new ParsePush();
-            push.setQuery(pushQuery); // Set our Installation query
-            push.setMessage("New message in " + mName);
-            push.sendInBackground();
+            pushChatroom("New message in " + mName);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void pushChatroom(String msg) {
+        //Get our Installation query
+        ParseQuery pushQuery = ParseInstallation.getQuery();
+        pushQuery.whereContainedIn("user", mPushMembers);
+
+        // Send push notification to query
+        ParsePush push = new ParsePush();
+        push.setQuery(pushQuery); // Set our Installation query
+        push.setMessage(msg);
+        push.sendInBackground();
     }
 
     /**

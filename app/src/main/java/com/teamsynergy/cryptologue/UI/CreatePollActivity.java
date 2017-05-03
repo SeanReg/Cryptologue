@@ -44,6 +44,8 @@ public class CreatePollActivity extends AppCompatActivity{
 
                 Chatroom room = (Chatroom)ObjectPasser.popObject("chatroomPoll");
                 builder.build(true, room);
+
+                room.pushChatroom("A new poll is avaliable in " + room.getName());
                 finish();
             }
         });

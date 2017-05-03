@@ -106,7 +106,10 @@ public class CreateEventActivity extends AppCompatActivity {
                     //mSelectedPlace.getLatLng();
                     //mSelectedPlace.getName();
                 }
-                builder.build(true, (Chatroom)(ObjectPasser.popObject("chatroomEvent")));
+                Chatroom room = (Chatroom)(ObjectPasser.popObject("chatroomEvent"));
+                builder.build(true, room);
+
+                room.pushChatroom("A new event is avaliable in " + room.getName());
                 finish();
             }
         });
