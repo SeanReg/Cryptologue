@@ -39,12 +39,15 @@ public class HomepageActivity extends AppCompatActivity {
     private ArrayList<Chatroom> mChatroomList = new ArrayList<>();
     private ArrayList<String> mMessagePreviewList = new ArrayList<>();
 
+    private static HomepageActivity mInstance = null;
+
     private ChatroomListAdapter mChatroomAdapter = null;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_homepage);
 
+        mInstance = this;
         ParseInit.start(this);
 
 /*        Chatroom.Builder builder = new Chatroom.Builder();
@@ -73,6 +76,19 @@ public class HomepageActivity extends AppCompatActivity {
         } else {
             updateChatrooms();
 
+        }
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (mInstance == this)
+            mInstance = null;
+    }
+
+    public static void remoteUpdateChatrooms() {
+        if (mInstance != null) {
+            mInstance.updateChatrooms();
         }
     }
 

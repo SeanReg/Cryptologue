@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.util.Base64;
 import android.util.Log;
 
+import com.teamsynergy.cryptologue.UI.HomepageActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -266,14 +268,10 @@ public class MessagingService extends Service {
                             String chatroomId = j.getString("chatroomId");
                             //String userId = j.getString("userId");
                             try {
-                                String p = "";
-                                for (byte b : key) {
-                                    p += Byte.toString(b) + ", ";
-                                }
-                                Log.d("Got Key", p);
-
                                 KeyManager manager = new KeyManager(getApplicationContext(), AccountManager.getInstance().getCurrentAccount().getUsername());
                                 manager.persistSymmetricKey(chatroomId, manager.rsaDecrypt(key));
+
+                                HomepageActivity.remoteUpdateChatrooms();
                             } catch (KeyManager.KeyGenerationException e) {
                                 e.printStackTrace();
                             } catch (Exception e) {
