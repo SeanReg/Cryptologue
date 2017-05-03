@@ -336,6 +336,7 @@ public class Chatroom implements SecurityCheck { //, Parcelable {
                 }
 
                 mChatroom.inviteUsers(mChatroom.mMembers);
+                mChatroom.pushChatroom("You have been added to " + mChatroom.getName());
 
                 if (mBuiltListener != null)
                     mBuiltListener.onChatroomBuilt(mChatroom);

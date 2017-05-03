@@ -52,7 +52,7 @@
             android:id="@+id/events_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Events (#)"/>
+            android:text="Events"/>
 
         <Button
             android:id="@+id/create_poll_button"
@@ -64,7 +64,7 @@
             android:id="@+id/polls_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Polls (#)"/>
+            android:text="Polls"/>
 
         <Button
             android:id="@+id/members_button"
