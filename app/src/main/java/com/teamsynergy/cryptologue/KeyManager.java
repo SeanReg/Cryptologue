@@ -6,6 +6,7 @@ import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
+import android.util.Log;
 import android.util.Pair;
 
 import com.parse.ParseException;
@@ -72,6 +73,7 @@ public class KeyManager {
                         .setStartDate(start.getTime())
                         .setEndDate(end.getTime())
                         .build();
+
 
                 KeyPairGenerator kpg = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
                 kpg.initialize(spec);

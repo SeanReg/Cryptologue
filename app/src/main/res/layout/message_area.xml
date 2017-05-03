@@ -1,26 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     android:gravity="bottom"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
-    <com.teamsynergy.cryptologue.UI.EditLatoText
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <com.teamsynergy.cryptologue.UI.EditLatoText
+            android:id="@+id/tagging_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:focusable="false"
+            android:inputType="none"
+            android:singleLine="false"
+            android:textColor="@color/black" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textColorHint="#CFD8DC"
-        android:textColor="@color/black"
-        android:hint="Write a message"
-        android:id="@+id/msg"
-        android:textCursorDrawable="@null"
-        android:inputType="textCapSentences"/>
+        android:gravity="bottom"
+        android:orientation="horizontal">
 
-    <Button
-        android:layout_width="42dp"
-        android:layout_height="wrap_content"
-        android:padding="4dp"
-        android:background="@android:drawable/ic_menu_send"
-        android:id="@+id/send" />
+        <com.teamsynergy.cryptologue.UI.EditLatoText
+            android:id="@+id/msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Write a message"
+            android:inputType="textCapSentences"
+            android:textColor="@color/black"
+            android:textColorHint="#CFD8DC"
+            android:textCursorDrawable="@null" />
+
+        <Button
+            android:id="@+id/send"
+            android:layout_width="46dp"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/ic_menu_send"
+            android:padding="4dp" />
+    </LinearLayout>
+
 </LinearLayout>
+
+

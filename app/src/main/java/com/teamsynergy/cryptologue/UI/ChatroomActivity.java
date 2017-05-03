@@ -15,6 +15,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
@@ -68,6 +70,8 @@ public class ChatroomActivity extends AppCompatActivity {
     private Button buttonLeaveChat;
     private Button buttonEvents;
 
+    private EditLatoText mTagSuggestions;
+
 
     private Chatroom mChatroom = null;
     private ParseFile mChatroomImage = null;
@@ -77,6 +81,9 @@ public class ChatroomActivity extends AppCompatActivity {
 
     private ArrayList<Pair<User, File>> mMembers = new ArrayList<>();
     private Thread mMemberTrackerThread;
+
+    private boolean mTaggingMode  = false;
+    private int     mTaggingIndex = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +100,8 @@ public class ChatroomActivity extends AppCompatActivity {
         buttonMembers = (Button) findViewById(R.id.members_button);
         buttonLeaveChat = (Button) findViewById(R.id.leave_chat_button);
 
+        mTagSuggestions = (EditLatoText)findViewById(R.id.tagging_options);
+        mTagSuggestions.setVisibility(View.GONE);
 
         listView = (ListView) findViewById(R.id.msgview);
 
@@ -134,6 +143,50 @@ public class ChatroomActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+        });
+        chatText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (!mTaggingMode) {
+                    mTaggingIndex = chatText.getText().length() - 1;
+
+                    if (mTaggingIndex >= 0 && chatText.getText().charAt(mTaggingIndex) == '@') {
+                        mTaggingMode = true;
+                        mTagSuggestions.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                if (mTaggingMode) {
+                    int len = chatText.getText().length();
+                    String msg = chatText.getText().toString();
+                    if (mTaggingIndex > len - 1 ||
+                            chatText.getText().charAt(mTaggingIndex) != '@' ||
+                            chatText.getText().charAt(len - 1) == ' ')  {
+                        mTaggingMode = false;
+                        mTagSuggestions.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    String nameStr = msg.substring(mTaggingIndex + 1).toLowerCase();
+                    mTagSuggestions.setText("");
+                    for (Pair<User, File>  member : mMembers) {
+                        String mem = member.first.getUsername().toLowerCase();
+                        if (mem.length() >= nameStr.length() && mem.substring(0, nameStr.length()).equals(nameStr))
+                            mTagSuggestions.setText(mTagSuggestions.getText().append("\n@" + member.first.getUsername()));
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
         buttonSend.setOnClickListener(new View.OnClickListener() {
@@ -260,6 +313,9 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     private void sendChatMessage() {
+        mTaggingMode = false;
+        mTagSuggestions.setVisibility(View.GONE);
+
         String msgTxt = chatText.getText().toString();
 
         //No blank messages!
